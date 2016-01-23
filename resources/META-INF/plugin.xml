@@ -1,0 +1,35 @@
+<idea-plugin version="2">
+  <id>com.webstorm.symbols</id>
+  <name>Symbols for JavaScript</name>
+  <version>1.0</version>
+  <vendor email="mateusz.mzielinski@gmail.com" url="https://github.com/ziolko">Mateusz Zieliński</vendor>
+
+  <description><![CDATA[
+        Support for Ruby-like symbols in JavaScript.<br>
+        Supported operations include rename, find usages, names completion.
+    ]]></description>
+
+  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <idea-version since-build="141.0"/>
+
+  <depends>com.intellij.modules.lang</depends>
+  <depends>JavaScript</depends>
+
+  <application-components>
+  <!-- Add your application components here -->
+    <component>
+      <implementation-class>com.webstorm.symbols.SymbolPluginInitializer</implementation-class>
+    </component>
+  </application-components>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <completion.contributor language="JavaScript" implementationClass="com.webstorm.symbols.SymbolCompletionContributor"/>
+    <annotator language="JavaScript" implementationClass="com.webstorm.symbols.annotate.SymbolAnnotator"/>
+    <renameHandler implementation="com.webstorm.symbols.rename.MyRenameHandler" />
+    <referencesSearch implementation="com.webstorm.symbols.reference.SymbolReferencesSearch"/>
+    <findUsagesHandlerFactory id="JavaScript" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
+    <usageTypeProvider implementation="com.webstorm.symbols.SymbolUsageTypeProvider"/>
+    <elementDescriptionProvider implementation="com.webstorm.symbols.SymbolElementDescriptionProvider" />
+    <fileBasedIndex implementation="com.webstorm.symbols.index.JSSymbolsIndex"/>
+  </extensions>
+</idea-plugin>
