@@ -13,9 +13,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 class SymbolReference implements PsiReference {
-    private PsiElement baseElement, element;
+    private JSLiteralExpression baseElement, element;
 
-    public SymbolReference(PsiElement baseElement, PsiElement element) {
+    public SymbolReference(JSLiteralExpression baseElement, JSLiteralExpression element) {
         this.baseElement = baseElement;
         this.element = element;
     }
@@ -44,18 +44,12 @@ class SymbolReference implements PsiReference {
 
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-        if(!(element instanceof JSLiteralExpression)) {
-            throw new IncorrectOperationException("This is not a JavaScript literal expression");
-        }
-
-        final JSLiteralExpression jsLiteralExpression = (JSLiteralExpression) element;
-
-        if(!jsLiteralExpression.isQuotedLiteral()) {
+        if(!element.isQuotedLiteral()) {
             throw new IncorrectOperationException("Only string literals can be renamed");
         }
 
-        final ElementManipulator<JSLiteralExpression> manipulator = ElementManipulators.getManipulator(jsLiteralExpression);
-        return manipulator.handleContentChange(jsLiteralExpression, newElementName);
+        final ElementManipulator<JSLiteralExpression> manipulator = ElementManipulators.getManipulator(element);
+        return manipulator.handleContentChange(element, newElementName);
     }
 
     @Override

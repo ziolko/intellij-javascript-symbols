@@ -12,7 +12,7 @@ public class SymbolElementDescriptionProvider implements ElementDescriptionProvi
     @Nullable
     @Override
     public String getElementDescription(@NotNull PsiElement element, @NotNull ElementDescriptionLocation location) {
-        if(SymbolUtils.isSymbol(element) && location instanceof UsageViewTypeLocation){
+        if(SymbolUtils.isSymbol(SymbolUtils.getJSLiteraExpression(element)) && location instanceof UsageViewTypeLocation){
             return "JavaScript symbol";
         }
 

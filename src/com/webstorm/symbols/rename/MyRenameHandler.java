@@ -1,5 +1,6 @@
 package com.webstorm.symbols.rename;
 
+import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.editor.Editor;
@@ -15,13 +16,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class MyRenameHandler implements RenameHandler {
     @Nullable
-    private static PsiElement getElement(DataContext dataContext) {
-        return LangDataKeys.PSI_ELEMENT.getData(dataContext);
+    private static JSLiteralExpression getElement(DataContext dataContext) {
+        return  SymbolUtils.getJSLiteraExpression(LangDataKeys.PSI_ELEMENT.getData(dataContext));
     }
 
     @Override
     public boolean isAvailableOnDataContext(DataContext dataContext) {
-        final PsiElement element = getElement(dataContext);
+        final JSLiteralExpression element = getElement(dataContext);
         return element != null && SymbolUtils.isSymbol(element);
     }
 
@@ -32,7 +33,7 @@ public class MyRenameHandler implements RenameHandler {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile psiFile, DataContext dataContext) {
-        final PsiElement element = getElement(dataContext);
+        final JSLiteralExpression element = getElement(dataContext);
 
         if(element == null || !SymbolUtils.isSymbol(element)){
             return;

@@ -25,9 +25,11 @@
   <extensions defaultExtensionNs="com.intellij">
     <completion.contributor language="JavaScript" implementationClass="com.webstorm.symbols.SymbolCompletionContributor"/>
     <annotator language="JavaScript" implementationClass="com.webstorm.symbols.annotate.SymbolAnnotator"/>
+    <findUsagesHandlerFactory id="JavaScript" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
+    <findUsagesHandlerFactory id="ECMAScript 6" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
+
     <renameHandler implementation="com.webstorm.symbols.rename.MyRenameHandler" />
     <referencesSearch implementation="com.webstorm.symbols.reference.SymbolReferencesSearch"/>
-    <findUsagesHandlerFactory id="JavaScript" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
     <usageTypeProvider implementation="com.webstorm.symbols.SymbolUsageTypeProvider"/>
     <elementDescriptionProvider implementation="com.webstorm.symbols.SymbolElementDescriptionProvider" />
     <fileBasedIndex implementation="com.webstorm.symbols.index.JSSymbolsIndex"/>

@@ -1,5 +1,6 @@
 package com.webstorm.symbols.rename;
 
+import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
@@ -16,11 +17,12 @@ public class SymbolRenameDialog extends RenameDialog {
 
     @Override
     public String[] getSuggestedNames() {
-        if(!SymbolUtils.isSymbol(getPsiElement())) {
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(getPsiElement());
+        if(!SymbolUtils.isSymbol(jsLiteralExpression)) {
             return super.getSuggestedNames();
         }
 
-        return new String[] { SymbolUtils.getSymbolFromPsiElement(getPsiElement()) };
+        return new String[] { SymbolUtils.getSymbolFromPsiElement(jsLiteralExpression) };
     }
 
     @Override

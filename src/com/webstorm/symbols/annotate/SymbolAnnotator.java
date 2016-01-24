@@ -24,16 +24,17 @@ import java.util.List;
 public class SymbolAnnotator implements Annotator {
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        final String symbol = SymbolUtils.getSymbolFromPsiElement(element);
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(element);
+        final String symbol = SymbolUtils.getSymbolFromPsiElement(jsLiteralExpression);
         if(symbol == null) return;
 
-        final TextRange range = new TextRange(element.getTextRange().getStartOffset() + 1,
-                element.getTextRange().getEndOffset() - 1);
+        final TextRange range = new TextRange(jsLiteralExpression.getTextRange().getStartOffset() + 1,
+                jsLiteralExpression.getTextRange().getEndOffset() - 1);
 
         final TextAttributes textAttributes = new TextAttributes();
         textAttributes.setForegroundColor(JBColor.BLUE);
 
-        if(isSymbolReferenced(symbol, element)) {
+        if(isSymbolReferenced(symbol, jsLiteralExpression)) {
             holder.createInfoAnnotation(range, null).setEnforcedTextAttributes(textAttributes);
         } else {
             textAttributes.setEffectType(EffectType.WAVE_UNDERSCORE);
@@ -45,7 +46,7 @@ public class SymbolAnnotator implements Annotator {
         }
     }
 
-    private boolean isSymbolReferenced(String symbol, PsiElement element) {
+    private boolean isSymbolReferenced(String symbol, JSLiteralExpression element) {
         final GlobalSearchScope searchScope = GlobalSearchScope.projectScope(element.getProject());
         final Collection<VirtualFile> references = FileBasedIndex.getInstance().getContainingFiles(JSSymbolsIndex.INDEX_ID, symbol, searchScope);
         if (references.size() == 0) return false;

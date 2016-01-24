@@ -11,30 +11,22 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SymbolUtils {
-    public static boolean isSymbol(@NotNull PsiElement psiElement) {
-        if(psiElement instanceof JSLiteralExpression) {
-            final JSLiteralExpression literal = (JSLiteralExpression) psiElement;
-            if(!literal.isQuotedLiteral()) return false;
-            final String text = ApplicationManager.getApplication().runReadAction((Computable<String>) () -> literal.getText());
-            return literal.isQuotedLiteral() && isSymbol(text, true);
-        }
-
-        return false;
+    public static boolean isSymbol(@Nullable JSLiteralExpression psiElement) {
+        if(psiElement == null) return false;
+        if(!psiElement.isQuotedLiteral()) return false;
+        final String text = ApplicationManager.getApplication().runReadAction((Computable<String>) () -> psiElement.getText());
+        return isSymbol(text, true);
     }
 
     public static boolean isSymbol(@NotNull String text, boolean withQuotes) {
         return getSymbolFromText(text, withQuotes) != null;
     }
 
-    public static @Nullable String getSymbolFromPsiElement(@NotNull PsiElement psiElement) {
-        if(psiElement instanceof JSLiteralExpression) {
-            final JSLiteralExpression literal = (JSLiteralExpression) psiElement;
-            if(!literal.isQuotedLiteral()) return null;
-            final String text = ApplicationManager.getApplication().runReadAction((Computable<String>) () -> literal.getText());
-            return getSymbolFromText(text, true);
-        }
-
-        return null;
+    public static @Nullable String getSymbolFromPsiElement(@Nullable JSLiteralExpression psiElement) {
+        if(psiElement == null) return null;
+        if(!psiElement.isQuotedLiteral()) return null;
+        final String text = ApplicationManager.getApplication().runReadAction((Computable<String>) () -> psiElement.getText());
+        return getSymbolFromText(text, true);
     }
 
     public static @Nullable String getSymbolFromText(@NotNull String text, boolean withQuotes) {
@@ -55,20 +47,25 @@ public class SymbolUtils {
         return text;
     }
 
-    public static void processSymbolsInPsiFile(@NotNull PsiFile file, @NotNull Processor<PsiElement> processor) {
+    public static void processSymbolsInPsiFile(@NotNull PsiFile file, @NotNull Processor<JSLiteralExpression> processor) {
         file.acceptChildren(new PsiRecursiveElementVisitor() {
             @Override
             public void visitElement(PsiElement element) {
                 super.visitElement(element);
-
-                if(element instanceof JSLiteralExpression) {
-                    final JSLiteralExpression literal = (JSLiteralExpression) element;
-
-                    if(literal.isQuotedLiteral() && isSymbol(literal.getText(), true)) {
-                        processor.process(element);
-                    }
+                final JSLiteralExpression jsLiteralExpression = getJSLiteraExpression(element);
+                if(isSymbol(jsLiteralExpression)) {
+                    processor.process(jsLiteralExpression);
                 }
             }
         });
+    }
+
+    @Nullable
+    public static JSLiteralExpression getJSLiteraExpression(@Nullable PsiElement psiElement) {
+        if(psiElement instanceof JSLiteralExpression) return (JSLiteralExpression) psiElement;
+        if(psiElement != null && psiElement.getParent() instanceof JSLiteralExpression) {
+            return (JSLiteralExpression) psiElement.getParent();
+        }
+        return null;
     }
 }
