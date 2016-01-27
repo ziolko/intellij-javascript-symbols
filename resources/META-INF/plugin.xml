@@ -5,8 +5,12 @@
   <vendor email="mateusz.mzielinski@gmail.com" url="https://github.com/ziolko">Mateusz Zieliński</vendor>
 
   <description><![CDATA[
-        Support for Ruby-like symbols in JavaScript.<br>
-        Supported operations include rename, find usages, names completion.
+        In JavaScript we quite often use strings as some kind of identifiers. Event and module names are good examples here.
+        <br><br>
+        A good IDE should support this in my opinion. With this plugin on board each JavaScript string in
+        format ':hyphen-identifier' becomes a 'symbol' which you can rename(Shift + F6) or find usages of (Alt + F7).
+        <br><br>
+        Find more details on <a href="https://github.com/ziolko/intellij-javascript-symbols">project home page</a>.
     ]]></description>
 
   <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
@@ -28,7 +32,7 @@
     <findUsagesHandlerFactory id="JavaScript" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
     <findUsagesHandlerFactory id="ECMAScript 6" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
 
-    <renameHandler implementation="com.webstorm.symbols.rename.MyRenameHandler" />
+    <renameHandler implementation="com.webstorm.symbols.rename.SymbolRenameHandler" />
     <referencesSearch implementation="com.webstorm.symbols.reference.SymbolReferencesSearch"/>
     <usageTypeProvider implementation="com.webstorm.symbols.SymbolUsageTypeProvider"/>
     <elementDescriptionProvider implementation="com.webstorm.symbols.SymbolElementDescriptionProvider" />

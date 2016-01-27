@@ -14,7 +14,7 @@ import com.webstorm.symbols.rename.SymbolRenameDialog;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class MyRenameHandler implements RenameHandler {
+public class SymbolRenameHandler implements RenameHandler {
     @Nullable
     private static JSLiteralExpression getElement(DataContext dataContext) {
         return  SymbolUtils.getJSLiteraExpression(LangDataKeys.PSI_ELEMENT.getData(dataContext));

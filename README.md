@@ -5,6 +5,12 @@ In JavaScript we quite often use strings as some kind of identifiers. Event and 
 A good IDE should support this in my opinion. With this plugin on board each JavaScript string
  in format ':hyphen-identifier' becomes a 'symbol' which you can rename(Shift + F6) or find usages of (Alt + F7).
  
+# How to install it
+You can find this plugin on [IntelliJ plugin repository](https://plugins.jetbrains.com/plugin/8168). 
+Take a look at [IntelliJ IDEA documentation](https://www.jetbrains.com/idea/help/installing-updating-and-uninstalling-repository-plugins.html) 
+for instructions about installing plugins. 
+ 
+# Features
 After installing, this plugin will recognize 'symbols' and will highlight them blue:  
 ![First usage](https://raw.githubusercontent.com/ziolko/intellij-javascript-symbols/master/images/first-usage.png)
 
