@@ -81,7 +81,7 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
 
     @Override
     public int getVersion() {
-        return 2;
+        return 5;
     }
 
     private static class IntegerDataExternalizer implements DataExternalizer<Integer> {

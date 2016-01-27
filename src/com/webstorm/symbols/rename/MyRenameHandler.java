@@ -40,10 +40,7 @@ public class MyRenameHandler implements RenameHandler {
         }
 
         RenameDialog dialog = new SymbolRenameDialog(project, element, null, editor);
-
-        if(!dialog.showAndGet()) {
-            return;
-        }
+        dialog.show();
     }
 
     @Override

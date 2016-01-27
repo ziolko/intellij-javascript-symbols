@@ -51,10 +51,11 @@ public class SymbolUtils {
         file.acceptChildren(new PsiRecursiveElementVisitor() {
             @Override
             public void visitElement(PsiElement element) {
-                super.visitElement(element);
                 final JSLiteralExpression jsLiteralExpression = getJSLiteraExpression(element);
                 if(isSymbol(jsLiteralExpression)) {
                     processor.process(jsLiteralExpression);
+                } else {
+                    super.visitElement(element);
                 }
             }
         });
