@@ -2,10 +2,11 @@ package com.webstorm.symbols.index;
 
 import com.google.common.collect.Maps;
 import com.intellij.lang.javascript.JavaScriptFileType;
+import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.util.Consumer;
+import com.intellij.util.Processor;
 import com.intellij.util.indexing.*;
 import com.intellij.util.io.DataExternalizer;
 import com.intellij.util.io.EnumeratorStringDescriptor;
@@ -24,14 +25,21 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
     public static final DataExternalizer<Integer> INTEGER_DATA_EXTERNALIZER = new IntegerDataExternalizer();
 
     private final KeyDescriptor<String> myKeyDescriptor = new EnumeratorStringDescriptor();
-    private final DataIndexer<String, Integer, FileContent> myIndexer = inputData -> {
-        Map<String, Integer> result = Maps.newHashMap();
-        SymbolUtils.processSymbolsInPsiFile(inputData.getPsiFile(), element -> {
-            final String symbol = SymbolUtils.getSymbolFromPsiElement(element);
-            result.put(symbol, result.getOrDefault(symbol, 0) + 1);
-            return true;
-        });
-        return result;
+    private final DataIndexer<String, Integer, FileContent> myIndexer = new DataIndexer<String, Integer, FileContent>() {
+        @NotNull
+        @Override
+        public Map<String, Integer> map(final @NotNull FileContent inputData) {
+            final Map<String, Integer> result = Maps.newHashMap();
+            SymbolUtils.processSymbolsInPsiFile(inputData.getPsiFile(), new Processor<JSLiteralExpression>() {
+                @Override
+                public boolean process(JSLiteralExpression element) {
+                    final String symbol = SymbolUtils.getSymbolFromPsiElement(element);
+                    result.put(symbol, result.getOrDefault(symbol, 0) + 1);
+                    return true;
+                }
+            });
+            return result;
+        }
     };
 
     @NotNull
@@ -63,8 +71,13 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
     public FileBasedIndex.InputFilter getInputFilter() {
          return new FileBasedIndex.FileTypeSpecificInputFilter() {
              @Override
-             public void registerFileTypesUsedForIndexing(@NotNull Consumer<FileType> fileTypeSink) {
-                 JavaScriptFileType.getFileTypesCompilableToJavaScript().forEach(fileTypeSink::consume);
+             public void registerFileTypesUsedForIndexing(final @NotNull Consumer<FileType> fileTypeSink) {
+                 JavaScriptFileType.getFileTypesCompilableToJavaScript().forEach(new java.util.function.Consumer<FileType>() {
+                     @Override
+                     public void accept(final FileType fileType) {
+                         fileTypeSink.consume(fileType);
+                     }
+                 });
              }
 
              @Override

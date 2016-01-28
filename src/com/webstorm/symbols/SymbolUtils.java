@@ -11,10 +11,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SymbolUtils {
-    public static boolean isSymbol(@Nullable JSLiteralExpression psiElement) {
+    public static boolean isSymbol(final @Nullable JSLiteralExpression psiElement) {
         if(psiElement == null) return false;
         if(!psiElement.isQuotedLiteral()) return false;
-        final String text = ApplicationManager.getApplication().runReadAction((Computable<String>) () -> psiElement.getText());
+        final String text = ApplicationManager.getApplication().runReadAction(new Computable<String>() {
+            @Override
+            public String compute() {
+                return psiElement.getText();
+            }
+        });
         return isSymbol(text, true);
     }
 
@@ -22,10 +27,15 @@ public class SymbolUtils {
         return getSymbolFromText(text, withQuotes) != null;
     }
 
-    public static @Nullable String getSymbolFromPsiElement(@Nullable JSLiteralExpression psiElement) {
+    public static @Nullable String getSymbolFromPsiElement(final @Nullable JSLiteralExpression psiElement) {
         if(psiElement == null) return null;
         if(!psiElement.isQuotedLiteral()) return null;
-        final String text = ApplicationManager.getApplication().runReadAction((Computable<String>) () -> psiElement.getText());
+        final String text = ApplicationManager.getApplication().runReadAction((Computable<String>) new Computable<String>() {
+            @Override
+            public String compute() {
+                return psiElement.getText();
+            }
+        });
         return getSymbolFromText(text, true);
     }
 
@@ -47,7 +57,7 @@ public class SymbolUtils {
         return text;
     }
 
-    public static void processSymbolsInPsiFile(@NotNull PsiFile file, @NotNull Processor<JSLiteralExpression> processor) {
+    public static void processSymbolsInPsiFile(@NotNull PsiFile file, final @NotNull Processor<JSLiteralExpression> processor) {
         file.acceptChildren(new PsiRecursiveElementVisitor() {
             @Override
             public void visitElement(PsiElement element) {
