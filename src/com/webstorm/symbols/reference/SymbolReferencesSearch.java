@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, ReferencesSearch.SearchParameters> {
     @Override
@@ -47,7 +46,7 @@ public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, Refe
         }
         else if(searchParameters.getEffectiveSearchScope() instanceof GlobalSearchScope) {
             final GlobalSearchScope globalSearchScope = (GlobalSearchScope) searchParameters.getEffectiveSearchScope();
-            final Collection<VirtualFile> filesWithSymbols = ApplicationManager.getApplication().runReadAction((Computable<Collection<VirtualFile>>) new Computable<Collection<VirtualFile>>() {
+            final Collection<VirtualFile> filesWithSymbols = ApplicationManager.getApplication().runReadAction(new Computable<Collection<VirtualFile>>() {
                         @Override
                         public Collection<VirtualFile> compute() {
                             return FileBasedIndex.getInstance().getContainingFiles(JSSymbolsIndex.INDEX_ID, searchedSymbolText, globalSearchScope);
@@ -55,20 +54,18 @@ public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, Refe
                     }
             );
 
-            filesWithSymbols.forEach(new Consumer<VirtualFile>() {
-                @Override
-                public void accept(final VirtualFile virtualFile) {
-                    final PsiFile psiFile = ApplicationManager.getApplication().runReadAction(new Computable<PsiFile>() {
-                                @Override
-                                public PsiFile compute() {
-                                    return PsiManager.getInstance(globalSearchScope.getProject()).findFile(virtualFile);
-                                }
-                            }
+            for (final VirtualFile virtualFile : filesWithSymbols) {
+                final PsiFile psiFile = ApplicationManager.getApplication().runReadAction(
+                    new Computable<PsiFile>() {
+                               @Override
+                               public PsiFile compute() {
+                                   return PsiManager.getInstance(globalSearchScope.getProject()).findFile(virtualFile);
+                               }
+                           }
                     );
 
-                    SymbolReferencesSearch.this.processPsiFile(psiFile, jsLiteralExpression, processor);
-                }
-            });
+                SymbolReferencesSearch.this.processPsiFile(psiFile, jsLiteralExpression, processor);
+            }
         }
     }
 
