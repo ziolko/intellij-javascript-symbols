@@ -72,9 +72,7 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
          return new FileBasedIndex.FileTypeSpecificInputFilter() {
              @Override
              public void registerFileTypesUsedForIndexing(@NotNull Consumer<FileType> fileTypeSink) {
-                 for(FileType fileType : JavaScriptFileType.getFileTypesCompilableToJavaScript()) {
-                     fileTypeSink.consume(fileType);
-                 }
+                 fileTypeSink.consume(JavaScriptFileType.INSTANCE);
              }
 
              @Override

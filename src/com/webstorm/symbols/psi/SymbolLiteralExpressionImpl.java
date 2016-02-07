@@ -127,12 +127,6 @@ public class SymbolLiteralExpressionImpl implements JSLiteralExpression, PsiName
 
     @Override
     @Nullable
-    public String getSignificantValue() {
-        return impl.getSignificantValue();
-    }
-
-    @Override
-    @Nullable
     public JSElementIndexingData getIndexingData() {
         return impl.getIndexingData();
     }

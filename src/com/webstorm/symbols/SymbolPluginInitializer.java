@@ -1,7 +1,7 @@
 package com.webstorm.symbols;
 
 import com.intellij.codeInsight.TargetElementEvaluator;
-import com.intellij.codeInsight.TargetElementUtil;
+import com.intellij.codeInsight.TargetElementUtilBase;
 import com.intellij.lang.LanguageExtension;
 import com.intellij.lang.javascript.JavaScriptSupportLoader;
 import com.intellij.lang.javascript.JavascriptLanguage;
@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
 public class SymbolPluginInitializer implements ApplicationComponent {
     @Override
     public void initComponent() {
-        TargetElementUtil targetElementUtil = TargetElementUtil.getInstance();
+        final TargetElementUtilBase targetElementUtil = TargetElementUtilBase.getInstance();
 
         try {
             final Field targetElementEvaluator = targetElementUtil.getClass().getDeclaredField("targetElementEvaluator");
@@ -23,7 +23,7 @@ public class SymbolPluginInitializer implements ApplicationComponent {
             targetElementEvaluator.setAccessible(true);
 
             // Explicitly add my target evaluator
-            LanguageExtension<TargetElementEvaluator> targetEvaluatorList = (LanguageExtension<TargetElementEvaluator>) targetElementEvaluator.get(targetElementUtil);
+            final LanguageExtension<TargetElementEvaluator> targetEvaluatorList = (LanguageExtension<TargetElementEvaluator>) targetElementEvaluator.get(targetElementUtil);
             targetEvaluatorList.addExplicitExtension(JavascriptLanguage.INSTANCE, new SymbolReferenceTargetEvaluator());
             targetEvaluatorList.addExplicitExtension(JavaScriptSupportLoader.ECMA_SCRIPT_6, new SymbolReferenceTargetEvaluator());
 
