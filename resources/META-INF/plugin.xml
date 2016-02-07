@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>com.webstorm.symbols</id>
   <name>Symbols for JavaScript</name>
-  <version>1.4</version>
+  <version>2.0</version>
   <vendor email="mateusz.mzielinski@gmail.com" url="https://github.com/ziolko">Mateusz Zieliński</vendor>
 
   <description><![CDATA[
@@ -13,7 +13,21 @@
         Find more details on <a href="https://github.com/ziolko/intellij-javascript-symbols">project home page</a>.
     ]]></description>
 
-  <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+  <change-notes><![CDATA[
+  <html>
+    <b>2.0</b> (02/07/2016)
+    <ul>
+      <li>Configuration of recognized regular expressions
+      <li>"Go to declaration" (CTRL + click) shows all symbol usages
+      <li>Support for WebStorm 10 & IDEA 14
+    </ul>
+    <b>1.0</b> (01/25/2016)
+    <ul>
+      <li>Initial release
+    </ul>
+  </html>
+  ]]></change-notes>
+
   <idea-version since-build="141.0"/>
 
   <depends>com.intellij.modules.lang</depends>
