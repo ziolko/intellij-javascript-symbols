@@ -36,7 +36,8 @@
     <findUsagesHandlerFactory id="ECMAScript 6" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
 
     <renameHandler implementation="com.webstorm.symbols.rename.SymbolRenameHandler" />
-    <referencesSearch implementation="com.webstorm.symbols.reference.SymbolReferencesSearch"/>
+    <gotoDeclarationHandler implementation="com.webstorm.symbols.declaration.SymbolGoToDeclarationHandler"/>
+    <referencesSearch  implementation="com.webstorm.symbols.reference.SymbolReferencesSearch"/>
     <usageTypeProvider implementation="com.webstorm.symbols.SymbolUsageTypeProvider"/>
     <elementDescriptionProvider implementation="com.webstorm.symbols.SymbolElementDescriptionProvider" />
     <fileBasedIndex implementation="com.webstorm.symbols.index.JSSymbolsIndex"/>
