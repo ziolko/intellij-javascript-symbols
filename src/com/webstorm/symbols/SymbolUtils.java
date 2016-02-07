@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.intellij.util.Processor;
+import com.webstorm.symbols.settings.SettingsComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +31,7 @@ public class SymbolUtils {
     public static @Nullable String getSymbolFromPsiElement(final @Nullable JSLiteralExpression psiElement) {
         if(psiElement == null) return null;
         if(!psiElement.isQuotedLiteral()) return null;
-        final String text = ApplicationManager.getApplication().runReadAction((Computable<String>) new Computable<String>() {
+        final String text = ApplicationManager.getApplication().runReadAction(new Computable<String>() {
             @Override
             public String compute() {
                 return psiElement.getText();
@@ -52,9 +53,15 @@ public class SymbolUtils {
             text = text.substring(1, text.length() - 1);
         }
 
-        if(!text.matches("^:[a-zA-Z0-9\\-]+$")) return null;
+        final String[] symbolRegExps = SettingsComponent.getInstance().getRegExp();
 
-        return text;
+        for(String symbolRegExp : symbolRegExps) {
+            if(text.matches(symbolRegExp)) {
+                return text;
+            }
+        }
+
+        return null;
     }
 
     public static void processSymbolsInPsiFile(@NotNull PsiFile file, final @NotNull Processor<JSLiteralExpression> processor) {
