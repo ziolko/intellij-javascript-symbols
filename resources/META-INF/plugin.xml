@@ -9,7 +9,7 @@
         <br><br>
         A good IDE should support this in my opinion. With this plugin you can define a format of your
          symbols (via RegExp). Each JavaScript string matching this format becomes a 'symbol' which
-         which you can rename(Shift + F6), find usages of (Alt + F7) or Go To (CTRL + Click).
+         you can rename(Shift + F6), find usages of (Alt + F7) or Go To (CTRL + Click).
         <br> <br>
         By default all strings in format ':hyphen-identifier' are symbols but you can configure
          recognized formats in File -> Settings -> Other Settings -> JavaScript Symbols.

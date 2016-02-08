@@ -4,7 +4,7 @@ In JavaScript we quite often use strings as some kind of identifiers. Event and 
  
 A good IDE should support this in my opinion. With this plugin you can define a format of your
  symbols (via RegExp). Each JavaScript string matching this format becomes a powerful 'symbol' which 
- which you can rename(Shift + F6), find usages of (Alt + F7) or go to usage (CTRL + click).
+ you can rename(Shift + F6), find usages of (Alt + F7) or go to usage (CTRL + click).
  
 By default all strings in format ':hyphen-identifier' are symbols but you can configure 
 recognized formats in the plugin configuration page.
