@@ -7,8 +7,12 @@
   <description><![CDATA[
         In JavaScript we quite often use strings as some kind of identifiers. Event and module names are good examples here.
         <br><br>
-        A good IDE should support this in my opinion. With this plugin on board each JavaScript string in
-        format ':hyphen-identifier' becomes a 'symbol' which you can rename(Shift + F6) or find usages of (Alt + F7).
+        A good IDE should support this in my opinion. With this plugin you can define a format of your
+         symbols (via RegExp). Each JavaScript string matching this format becomes a 'symbol' which
+         which you can rename(Shift + F6), find usages of (Alt + F7) or Go To (CTRL + Click).
+        <br> <br>
+        By default all strings in format ':hyphen-identifier' are symbols but you can configure
+         recognized formats in File -> Settings -> Other Settings -> JavaScript Symbols.
         <br><br>
         Find more details on <a href="https://github.com/ziolko/intellij-javascript-symbols">project home page</a>.
     ]]></description>
