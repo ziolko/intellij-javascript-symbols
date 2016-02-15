@@ -34,7 +34,10 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
                 @Override
                 public boolean process(JSLiteralExpression element) {
                     final String symbol = SymbolUtils.getSymbolFromPsiElement(element);
-                    result.put(symbol, result.getOrDefault(symbol, 0) + 1);
+                    final Integer currentValue = result.containsKey(symbol) ? result.get(symbol) : 0;
+
+                    result.put(symbol, currentValue + 1);
+
                     return true;
                 }
             });
@@ -69,17 +72,17 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
     @NotNull
     @Override
     public FileBasedIndex.InputFilter getInputFilter() {
-         return new FileBasedIndex.FileTypeSpecificInputFilter() {
-             @Override
-             public void registerFileTypesUsedForIndexing(@NotNull Consumer<FileType> fileTypeSink) {
-                 fileTypeSink.consume(JavaScriptFileType.INSTANCE);
-             }
+        return new FileBasedIndex.FileTypeSpecificInputFilter() {
+            @Override
+            public void registerFileTypesUsedForIndexing(@NotNull Consumer<FileType> fileTypeSink) {
+                fileTypeSink.consume(JavaScriptFileType.INSTANCE);
+            }
 
-             @Override
-             public boolean acceptInput(@NotNull VirtualFile file) {
-                 return true;
-             }
-         };
+            @Override
+            public boolean acceptInput(@NotNull VirtualFile file) {
+                return true;
+            }
+        };
     }
 
     @Override
@@ -89,7 +92,7 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
 
     @Override
     public int getVersion() {
-        return 6;
+        return 7;
     }
 
     private static class IntegerDataExternalizer implements DataExternalizer<Integer> {

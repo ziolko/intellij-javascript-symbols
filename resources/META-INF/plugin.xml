@@ -1,7 +1,7 @@
 <idea-plugin version="2">
   <id>com.webstorm.symbols</id>
   <name>Symbols for JavaScript</name>
-  <version>2.0</version>
+  <version>2.0.1</version>
   <vendor email="mateusz.mzielinski@gmail.com" url="https://github.com/ziolko">Mateusz Zieliński</vendor>
 
   <description><![CDATA[
@@ -19,6 +19,12 @@
 
   <change-notes><![CDATA[
   <html>
+
+    <b>2.0.1</b> (02/15/2016)
+    <ul>
+      <li>Fix "java.lang.NoSuchMethodError" for Java 7
+      <li>Update plugin description
+    </ul>
     <b>2.0</b> (02/07/2016)
     <ul>
       <li>Configuration of recognized regular expressions
