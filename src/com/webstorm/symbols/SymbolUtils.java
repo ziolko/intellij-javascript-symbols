@@ -79,11 +79,17 @@ public class SymbolUtils {
     }
 
     @Nullable
-    public static JSLiteralExpression getJSLiteraExpression(@Nullable PsiElement psiElement) {
+    public static JSLiteralExpression getJSLiteraExpression(@Nullable final PsiElement psiElement) {
+        if(psiElement == null) return null;
         if(psiElement instanceof JSLiteralExpression) return (JSLiteralExpression) psiElement;
-        if(psiElement != null && psiElement.getParent() instanceof JSLiteralExpression) {
-            return (JSLiteralExpression) psiElement.getParent();
-        }
-        return null;
+
+        final PsiElement parent = ApplicationManager.getApplication().runReadAction(new Computable<PsiElement>() {
+            @Override
+            public PsiElement compute() {
+                return psiElement.getParent();
+            }
+        });
+
+        return (parent instanceof JSLiteralExpression) ? (JSLiteralExpression) parent : null;
     }
 }
