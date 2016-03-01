@@ -2,9 +2,9 @@
 
 In JavaScript we quite often use strings as some kind of identifiers. Event and module names are good examples here.
  
-A good IDE should support this in my opinion. With this plugin you can define a format of your
- symbols (via RegExp). Each JavaScript string matching this format becomes a powerful 'symbol' which 
- you can rename(Shift + F6), find usages of (Alt + F7) or go to usage (CTRL + click).
+A good IDE should support this in my opinion. With this plugin you can define a format
+ of your identifiers. Each JavaScript string matching this format becomes a 'symbol' which
+ you can rename(Shift + F6), find usages of (Alt + F7) or Go To (CTRL + Click).
  
 By default all strings in format ':hyphen-identifier' are symbols but you can configure 
 recognized formats in the plugin configuration page.
