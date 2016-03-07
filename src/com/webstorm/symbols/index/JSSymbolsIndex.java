@@ -2,9 +2,8 @@ package com.webstorm.symbols.index;
 
 import com.google.common.collect.Maps;
 import com.intellij.lang.javascript.JavaScriptFileType;
-import com.intellij.lang.javascript.psi.JSLiteralExpression;
-import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.StdFileTypes;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Consumer;
@@ -78,6 +77,9 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
             @Override
             public void registerFileTypesUsedForIndexing(@NotNull Consumer<FileType> fileTypeSink) {
                 fileTypeSink.consume(JavaScriptFileType.INSTANCE);
+                fileTypeSink.consume(StdFileTypes.HTML);
+                fileTypeSink.consume(StdFileTypes.JS);
+                fileTypeSink.consume(StdFileTypes.XHTML);
             }
 
             @Override
