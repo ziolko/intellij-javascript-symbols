@@ -1,11 +1,13 @@
 package com.webstorm.symbols.rename;
 
+import com.intellij.lang.findUsages.DescriptiveNameUtil;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.refactoring.rename.RenameDialog;
+import com.intellij.usageView.UsageViewUtil;
 import com.webstorm.symbols.SymbolUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,5 +37,11 @@ public class SymbolRenameDialog extends RenameDialog {
     @Override
     protected boolean areButtonsValid() {
         return SymbolUtils.isSymbol(getNewName(), false);
+    }
+
+    @Override
+    protected String getFullName() {
+        String symbolName = DescriptiveNameUtil.getDescriptiveName(getPsiElement());
+        return ("JavaScript symbol " + symbolName).trim();
     }
 }

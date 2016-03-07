@@ -1,21 +1,29 @@
 package com.webstorm.symbols.reference;
 
+import com.intellij.lang.ASTNode;
+import com.intellij.lang.javascript.JSElementTypes;
+import com.intellij.lang.javascript.JSTokenTypes;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
+import com.intellij.lang.javascript.psi.JSProperty;
+import com.intellij.lang.javascript.psi.impl.JSChangeUtil;
+import com.intellij.lang.javascript.psi.types.JSStringLiteralTypeImpl;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.ElementManipulator;
 import com.intellij.psi.ElementManipulators;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.util.IncorrectOperationException;
+import com.webstorm.symbols.SymbolUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 class SymbolReference implements PsiReference {
-    private JSLiteralExpression baseElement, element;
+    private PsiElement baseElement, element;
 
-    public SymbolReference(JSLiteralExpression baseElement, JSLiteralExpression element) {
+    public SymbolReference(PsiElement baseElement, PsiElement element) {
         this.baseElement = baseElement;
         this.element = element;
     }
@@ -44,12 +52,34 @@ class SymbolReference implements PsiReference {
 
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-        if(!element.isQuotedLiteral()) {
-            throw new IncorrectOperationException("Only string literals can be renamed");
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(element);
+        final JSProperty jsProperty = SymbolUtils.getJSProperty(element);
+
+        if(jsLiteralExpression != null) {
+            final ElementManipulator<JSLiteralExpression> manipulator = ElementManipulators.getManipulator(jsLiteralExpression);
+            return manipulator.handleContentChange(jsLiteralExpression, newElementName);
         }
 
-        final ElementManipulator<JSLiteralExpression> manipulator = ElementManipulators.getManipulator(element);
-        return manipulator.handleContentChange(element, newElementName);
+        if(jsProperty != null) {
+            ASTNode renamedNode = jsProperty.findNameIdentifier();
+            ASTNode parent = jsProperty.getNode();
+            if(renamedNode != null && renamedNode.getElementType() == JSElementTypes.REFERENCE_EXPRESSION && renamedNode.getFirstChildNode() != null) {
+                parent = renamedNode;
+                renamedNode = renamedNode.getFirstChildNode();
+            }
+
+            assert renamedNode != null;
+            ASTNode nameElement;
+            try {
+                nameElement = JSChangeUtil.createNameIdentifier(jsProperty.getProject(), newElementName, renamedNode.getElementType());
+            } catch(Exception e) {
+                nameElement = JSChangeUtil.createNameIdentifier(jsProperty.getProject(), newElementName, JSTokenTypes.STRING_LITERAL);
+            }
+
+            parent.replaceChild(renamedNode, nameElement);
+        }
+
+        return element;
     }
 
     @Override

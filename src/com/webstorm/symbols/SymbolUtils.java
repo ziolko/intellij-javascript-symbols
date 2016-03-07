@@ -1,6 +1,7 @@
 package com.webstorm.symbols;
 
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
+import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
@@ -24,6 +25,17 @@ public class SymbolUtils {
         return isSymbol(text, true);
     }
 
+    public static boolean isSymbol(final @Nullable JSProperty jsProperty) {
+        if(jsProperty == null) return false;
+        final String text =  ApplicationManager.getApplication().runReadAction(new Computable<String>() {
+            @Override
+            public String compute() {
+                return jsProperty.getName();
+            }
+        });
+        return isSymbol(text, false);
+    }
+
     public static boolean isSymbol(@NotNull String text, boolean withQuotes) {
         return getSymbolFromText(text, withQuotes) != null;
     }
@@ -38,6 +50,33 @@ public class SymbolUtils {
             }
         });
         return getSymbolFromText(text, true);
+    }
+
+    public static @Nullable String getSymbolFromPsiElement(final @Nullable JSProperty psiElement) {
+        if(psiElement == null) return null;
+        final String text = ApplicationManager.getApplication().runReadAction(new Computable<String>() {
+            @Override
+            public String compute() {
+                return psiElement.getNameIdentifier() != null ? psiElement.getNameIdentifier().getText() : null;
+            }
+        });
+
+        if(text == null) return null;
+        return getSymbolFromText(text, isQuoted(text));
+    }
+
+    public static @Nullable String getSymbolFromPsiElement(final @Nullable PsiElement psiElement) {
+        final JSLiteralExpression jsLiteralExpression = getJSLiteraExpression(psiElement);
+        final JSProperty jsProperty = getJSProperty(psiElement);
+
+        if(jsLiteralExpression != null) {
+            return SymbolUtils.getSymbolFromPsiElement(jsLiteralExpression);
+        }
+        if(jsProperty != null) {
+            return SymbolUtils.getSymbolFromPsiElement(jsProperty);
+        }
+
+        return null;
     }
 
     public static @Nullable String getSymbolFromText(@NotNull String text, boolean withQuotes) {
@@ -64,13 +103,18 @@ public class SymbolUtils {
         return null;
     }
 
-    public static void processSymbolsInPsiFile(@NotNull PsiFile file, final @NotNull Processor<JSLiteralExpression> processor) {
+    public static void processSymbolsInPsiFile(@NotNull PsiFile file, final @NotNull Processor<PsiElement> processor) {
         file.acceptChildren(new PsiRecursiveElementVisitor() {
             @Override
             public void visitElement(PsiElement element) {
                 final JSLiteralExpression jsLiteralExpression = getJSLiteraExpression(element);
+                final JSProperty jsProperty = getJSProperty(element);
+
                 if(isSymbol(jsLiteralExpression)) {
                     processor.process(jsLiteralExpression);
+                } else if(isSymbol(jsProperty)){
+                    processor.process(jsProperty);
+                    super.visitElement(element);
                 } else {
                     super.visitElement(element);
                 }
@@ -91,5 +135,14 @@ public class SymbolUtils {
         });
 
         return (parent instanceof JSLiteralExpression) ? (JSLiteralExpression) parent : null;
+    }
+
+    @Nullable
+    public static JSProperty getJSProperty(@Nullable final PsiElement psiElement) {
+        return (psiElement instanceof JSProperty) ? (JSProperty) psiElement : null;
+    }
+
+    public static boolean isQuoted(final @Nullable String text) {
+        return text != null && (text.charAt(0) == '\'' || text.charAt(0) == '"');
     }
 }

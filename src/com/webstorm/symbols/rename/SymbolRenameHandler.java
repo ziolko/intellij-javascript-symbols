@@ -1,6 +1,7 @@
 package com.webstorm.symbols.rename;
 
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
+import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.editor.Editor;
@@ -15,15 +16,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SymbolRenameHandler implements RenameHandler {
-    @Nullable
-    private static JSLiteralExpression getElement(DataContext dataContext) {
-        return  SymbolUtils.getJSLiteraExpression(LangDataKeys.PSI_ELEMENT.getData(dataContext));
-    }
-
     @Override
     public boolean isAvailableOnDataContext(DataContext dataContext) {
-        final JSLiteralExpression element = getElement(dataContext);
-        return element != null && SymbolUtils.isSymbol(element);
+        final PsiElement psiElement = LangDataKeys.PSI_ELEMENT.getData(dataContext);
+
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(psiElement);
+        if(jsLiteralExpression != null && SymbolUtils.isSymbol(jsLiteralExpression)) return true;
+
+        final JSProperty jsProperty = SymbolUtils.getJSProperty(psiElement);
+        if(jsProperty != null && SymbolUtils.isSymbol(jsProperty)) return true;
+
+        return false;
     }
 
     @Override
@@ -33,13 +36,15 @@ public class SymbolRenameHandler implements RenameHandler {
 
     @Override
     public void invoke(@NotNull Project project, Editor editor, PsiFile psiFile, DataContext dataContext) {
-        final JSLiteralExpression element = getElement(dataContext);
+        final PsiElement psiElement = LangDataKeys.PSI_ELEMENT.getData(dataContext);
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(psiElement);
+        final JSProperty jsProperty = SymbolUtils.getJSProperty(psiElement);
 
-        if(element == null || !SymbolUtils.isSymbol(element)){
+        if(!SymbolUtils.isSymbol(jsLiteralExpression) && !SymbolUtils.isSymbol(jsProperty)){
             return;
         }
 
-        RenameDialog dialog = new SymbolRenameDialog(project, element, null, editor);
+        RenameDialog dialog = new SymbolRenameDialog(project, psiElement, null, editor);
         dialog.show();
     }
 

@@ -1,10 +1,12 @@
 package com.webstorm.symbols.reference;
 
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
+import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.QueryExecutorBase;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiReference;
@@ -23,26 +25,15 @@ import java.util.Objects;
 public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, ReferencesSearch.SearchParameters> {
     @Override
     public void processQuery(final @NotNull ReferencesSearch.SearchParameters searchParameters, final @NotNull Processor<PsiReference> processor) {
-        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(searchParameters.getElementToSearch());
-        if(jsLiteralExpression == null) {
-            return;
-        }
-
-        final String searchedSymbolText = SymbolUtils.getSymbolFromText(ApplicationManager.getApplication().runReadAction(
-                 new Computable<String>() {
-                    @Override
-                    public String compute() {
-                        return jsLiteralExpression.getText();
-                    }
-                }
-        ), true);
+        final PsiElement psiElement = searchParameters.getElementToSearch();
+        final String searchedSymbolText = SymbolUtils.getSymbolFromPsiElement(psiElement);
 
         if(searchedSymbolText == null) {
             return;
         }
 
         if(searchParameters.getEffectiveSearchScope() instanceof LocalSearchScope) {
-            processPsiFile(jsLiteralExpression.getContainingFile(), jsLiteralExpression, processor);
+            processPsiFile(psiElement.getContainingFile(), psiElement, processor);
         }
         else if(searchParameters.getEffectiveSearchScope() instanceof GlobalSearchScope) {
             final GlobalSearchScope globalSearchScope = (GlobalSearchScope) searchParameters.getEffectiveSearchScope();
@@ -64,21 +55,20 @@ public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, Refe
                            }
                     );
 
-                SymbolReferencesSearch.this.processPsiFile(psiFile, jsLiteralExpression, processor);
+                SymbolReferencesSearch.this.processPsiFile(psiFile, psiElement, processor);
             }
         }
     }
 
-    private void processPsiFile(final PsiFile psiFile,final JSLiteralExpression searchedElement,final Processor<PsiReference> processor) {
+    private void processPsiFile(final PsiFile psiFile, final PsiElement searchedElement, final Processor<PsiReference> processor) {
         ApplicationManager.getApplication().runReadAction(new Runnable() {
             @Override
             public void run() {
-                final String searchedSymbolText = SymbolUtils.getSymbolFromText(searchedElement.getText(), true);
-
-                SymbolUtils.processSymbolsInPsiFile(psiFile, new Processor<JSLiteralExpression>() {
+                final String searchedSymbolText = SymbolUtils.getSymbolFromPsiElement(searchedElement);
+                SymbolUtils.processSymbolsInPsiFile(psiFile, new Processor<PsiElement>() {
                     @Override
-                    public boolean process(JSLiteralExpression element) {
-                        final String symbolText = SymbolUtils.getSymbolFromText(element.getText(), true);
+                    public boolean process(PsiElement element) {
+                        final String symbolText = SymbolUtils.getSymbolFromPsiElement(element);
 
                         if (Objects.equals(symbolText, searchedSymbolText)) {
                             processor.process(new SymbolReference(searchedElement, element));

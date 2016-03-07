@@ -2,7 +2,9 @@ package com.webstorm.symbols.reference;
 
 import com.intellij.codeInsight.TargetElementEvaluator;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
+import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.lang.javascript.psi.impl.JSLiteralExpressionImpl;
+import com.intellij.lang.javascript.psi.impl.JSPropertyNameReference;
 import com.intellij.lang.javascript.psi.impl.JSTextReference;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
@@ -21,7 +23,8 @@ public class SymbolReferenceTargetEvaluator implements TargetElementEvaluator {
     @Override
     public PsiElement getElementByReference(@NotNull PsiReference psiReference, int i) {
         final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(psiReference.getElement());
-        if(psiReference instanceof JSTextReference && SymbolUtils.isSymbol(jsLiteralExpression)) {
+
+         if(psiReference instanceof JSTextReference && SymbolUtils.isSymbol(jsLiteralExpression)) {
             return new SymbolLiteralExpressionImpl((JSLiteralExpressionImpl) psiReference.getElement());
         }
 

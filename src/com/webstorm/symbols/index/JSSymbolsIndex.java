@@ -3,8 +3,10 @@ package com.webstorm.symbols.index;
 import com.google.common.collect.Maps;
 import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
+import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.Consumer;
 import com.intellij.util.Processor;
 import com.intellij.util.indexing.*;
@@ -30,14 +32,14 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
         @Override
         public Map<String, Integer> map(final @NotNull FileContent inputData) {
             final Map<String, Integer> result = Maps.newHashMap();
-            SymbolUtils.processSymbolsInPsiFile(inputData.getPsiFile(), new Processor<JSLiteralExpression>() {
+            SymbolUtils.processSymbolsInPsiFile(inputData.getPsiFile(), new Processor<PsiElement>() {
                 @Override
-                public boolean process(JSLiteralExpression element) {
+                public boolean process(PsiElement element) {
                     final String symbol = SymbolUtils.getSymbolFromPsiElement(element);
-                    final Integer currentValue = result.containsKey(symbol) ? result.get(symbol) : 0;
-
-                    result.put(symbol, currentValue + 1);
-
+                    if(symbol != null) {
+                        final Integer currentValue = result.containsKey(symbol) ? result.get(symbol) : 0;
+                        result.put(symbol, currentValue + 1);
+                    }
                     return true;
                 }
             });
@@ -92,7 +94,7 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
 
     @Override
     public int getVersion() {
-        return 7;
+        return 8;
     }
 
     private static class IntegerDataExternalizer implements DataExternalizer<Integer> {

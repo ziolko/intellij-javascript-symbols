@@ -4,8 +4,12 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
+import com.intellij.lang.javascript.psi.JSProperty;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.markup.EffectType;
 import com.intellij.openapi.editor.markup.TextAttributes;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -18,23 +22,51 @@ import com.webstorm.symbols.index.JSSymbolsIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 public class SymbolAnnotator implements Annotator {
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(element);
-        final String symbol = SymbolUtils.getSymbolFromPsiElement(jsLiteralExpression);
-        if(symbol == null) return;
+        final JSProperty jsProperty = SymbolUtils.getJSProperty(element);
 
-        final TextRange range = new TextRange(jsLiteralExpression.getTextRange().getStartOffset() + 1,
-                jsLiteralExpression.getTextRange().getEndOffset() - 1);
+        final String symbol;
+        final TextRange range;
+        final Project project;
+
+        if(jsLiteralExpression != null) {
+            symbol = SymbolUtils.getSymbolFromPsiElement(jsLiteralExpression);
+            if(symbol == null) return;
+            range = new TextRange(jsLiteralExpression.getTextRange().getStartOffset() + 1, jsLiteralExpression.getTextRange().getEndOffset() - 1);
+            project = jsLiteralExpression.getProject();
+        } else if(jsProperty != null && jsProperty.getNameIdentifier() != null) {
+            symbol = SymbolUtils.getSymbolFromPsiElement(jsProperty);
+            if(symbol == null) return;
+            range = ApplicationManager.getApplication().runReadAction(new Computable<TextRange>() {
+                @Override
+                public TextRange compute() {
+                    final PsiElement nameIdentifier = jsProperty.getNameIdentifier();
+                    final String text = nameIdentifier.getText();
+                    final int offset = SymbolUtils.isQuoted(text) ? 1 : 0;
+                    final int start = nameIdentifier.getTextRange().getStartOffset() + offset;
+                    final int end = nameIdentifier.getTextRange().getEndOffset() - offset;
+                    if(end <= start) return null;
+
+                    return new TextRange(start, end);
+                }
+            });
+
+            project = jsProperty.getProject();
+        } else {
+            return;
+        }
+
+        if(range == null) return;
 
         final TextAttributes textAttributes = new TextAttributes();
         textAttributes.setForegroundColor(JBColor.BLUE);
 
-        if(isSymbolReferenced(symbol, jsLiteralExpression)) {
+        if(isSymbolReferenced(symbol, project)) {
             holder.createInfoAnnotation(range, null).setEnforcedTextAttributes(textAttributes);
         } else {
             textAttributes.setEffectType(EffectType.WAVE_UNDERSCORE);
@@ -46,8 +78,8 @@ public class SymbolAnnotator implements Annotator {
         }
     }
 
-    private boolean isSymbolReferenced(String symbol, JSLiteralExpression element) {
-        final GlobalSearchScope searchScope = GlobalSearchScope.projectScope(element.getProject());
+    private boolean isSymbolReferenced(String symbol, Project project) {
+        final GlobalSearchScope searchScope = GlobalSearchScope.projectScope(project);
         final Collection<VirtualFile> references = FileBasedIndex.getInstance().getContainingFiles(JSSymbolsIndex.INDEX_ID, symbol, searchScope);
         if (references.size() == 0) return false;
         if (references.size() > 1) return true;
