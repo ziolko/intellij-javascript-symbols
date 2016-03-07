@@ -7,6 +7,7 @@ import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementVisitor;
+import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.util.Processor;
 import com.webstorm.symbols.settings.SettingsComponent;
 import org.jetbrains.annotations.NotNull;
@@ -144,5 +145,27 @@ public class SymbolUtils {
 
     public static boolean isQuoted(final @Nullable String text) {
         return text != null && (text.charAt(0) == '\'' || text.charAt(0) == '"');
+    }
+
+    @Nullable
+    public static PsiElement getSymbolElement(@Nullable final PsiElement sourceElement) {
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(sourceElement);
+        if(SymbolUtils.isSymbol(jsLiteralExpression)) return jsLiteralExpression;
+
+        final JSProperty jsProperty = SymbolUtils.getJSProperty(sourceElement);
+        if(SymbolUtils.isSymbol(jsProperty)) return jsProperty;
+
+        if(sourceElement instanceof LeafPsiElement) {
+            final JSProperty parentJsProperty = ApplicationManager.getApplication().runReadAction(new Computable<JSProperty>() {
+                @Override
+                public JSProperty compute() {
+                    return SymbolUtils.getJSProperty(sourceElement.getParent());
+                }
+            });
+
+            if(SymbolUtils.isSymbol(parentJsProperty)) return parentJsProperty;
+        }
+
+        return null;
     }
 }

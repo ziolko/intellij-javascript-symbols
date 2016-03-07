@@ -25,7 +25,7 @@ public class SymbolGoToDeclarationHandler implements GotoDeclarationHandler {
     @Nullable
     @Override
     public PsiElement[] getGotoDeclarationTargets(@Nullable final PsiElement sourceElement, int offset, Editor editor) {
-        final PsiElement symbolElement = getSymbolElement(sourceElement);
+        final PsiElement symbolElement = SymbolUtils.getSymbolElement(sourceElement);
 
         if(symbolElement == null) return null;
 
@@ -44,28 +44,6 @@ public class SymbolGoToDeclarationHandler implements GotoDeclarationHandler {
         });
 
         return psiElements.toArray(new PsiElement[psiElements.size()]);
-    }
-
-    @Nullable
-    private PsiElement getSymbolElement(@Nullable final PsiElement sourceElement) {
-        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(sourceElement);
-        if(SymbolUtils.isSymbol(jsLiteralExpression)) return jsLiteralExpression;
-
-        final JSProperty jsProperty = SymbolUtils.getJSProperty(sourceElement);
-        if(SymbolUtils.isSymbol(jsProperty)) return jsProperty;
-
-        if(sourceElement instanceof LeafPsiElement) {
-            final JSProperty parentJsProperty = ApplicationManager.getApplication().runReadAction(new Computable<JSProperty>() {
-                @Override
-                public JSProperty compute() {
-                    return SymbolUtils.getJSProperty(sourceElement.getParent());
-                }
-            });
-
-            if(SymbolUtils.isSymbol(parentJsProperty)) return parentJsProperty;
-        }
-
-        return null;
     }
 
     @Nullable

@@ -6,13 +6,13 @@ import com.intellij.lang.javascript.JSTokenTypes;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.lang.javascript.psi.impl.JSChangeUtil;
-import com.intellij.lang.javascript.psi.types.JSStringLiteralTypeImpl;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.ElementManipulator;
 import com.intellij.psi.ElementManipulators;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.util.IncorrectOperationException;
 import com.webstorm.symbols.SymbolUtils;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +35,19 @@ class SymbolReference implements PsiReference {
 
     @Override
     public TextRange getRangeInElement() {
+        final JSProperty jsProperty = SymbolUtils.getJSProperty(element);
+
+        if(jsProperty != null) {
+            PsiElement nameIdentifier = ApplicationManager.getApplication().runReadAction(new Computable<PsiElement>() {
+                @Override
+                public PsiElement compute() {
+                    return jsProperty.getNameIdentifier();
+                }
+            });
+
+            if(nameIdentifier != null) return new TextRange(0, nameIdentifier.getTextLength());
+        }
+
         return new TextRange(0, element.getTextLength());
     }
 

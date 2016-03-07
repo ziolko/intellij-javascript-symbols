@@ -16,7 +16,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.ui.JBColor;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import com.webstorm.symbols.SymbolUtils;
 import com.webstorm.symbols.index.JSSymbolsIndex;
 import org.jetbrains.annotations.NotNull;
@@ -27,20 +26,20 @@ import java.util.List;
 public class SymbolAnnotator implements Annotator {
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(element);
-        final JSProperty jsProperty = SymbolUtils.getJSProperty(element);
+        final PsiElement symbolPsiElement = SymbolUtils.getSymbolElement(element);
+        if(symbolPsiElement == null) return;
 
-        final String symbol;
+        final String symbol = SymbolUtils.getSymbolFromPsiElement(symbolPsiElement);
+        final Project project = symbolPsiElement.getProject();
+
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(symbolPsiElement);
+        final JSProperty jsProperty = SymbolUtils.getJSProperty(symbolPsiElement);
+
         final TextRange range;
-        final Project project;
 
         if(jsLiteralExpression != null) {
-            symbol = SymbolUtils.getSymbolFromPsiElement(jsLiteralExpression);
-            if(symbol == null) return;
             range = new TextRange(jsLiteralExpression.getTextRange().getStartOffset() + 1, jsLiteralExpression.getTextRange().getEndOffset() - 1);
-            project = jsLiteralExpression.getProject();
         } else if(jsProperty != null && jsProperty.getNameIdentifier() != null) {
-            symbol = SymbolUtils.getSymbolFromPsiElement(jsProperty);
             if(symbol == null) return;
             range = ApplicationManager.getApplication().runReadAction(new Computable<TextRange>() {
                 @Override
@@ -55,8 +54,6 @@ public class SymbolAnnotator implements Annotator {
                     return new TextRange(start, end);
                 }
             });
-
-            project = jsProperty.getProject();
         } else {
             return;
         }
