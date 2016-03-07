@@ -15,26 +15,11 @@ import org.jetbrains.annotations.Nullable;
 
 public class SymbolUtils {
     public static boolean isSymbol(final @Nullable JSLiteralExpression psiElement) {
-        if(psiElement == null) return false;
-        if(!psiElement.isQuotedLiteral()) return false;
-        final String text = ApplicationManager.getApplication().runReadAction(new Computable<String>() {
-            @Override
-            public String compute() {
-                return psiElement.getText();
-            }
-        });
-        return isSymbol(text, true);
+        return getSymbolFromPsiElement(psiElement) != null;
     }
 
     public static boolean isSymbol(final @Nullable JSProperty jsProperty) {
-        if(jsProperty == null) return false;
-        final String text =  ApplicationManager.getApplication().runReadAction(new Computable<String>() {
-            @Override
-            public String compute() {
-                return jsProperty.getName();
-            }
-        });
-        return isSymbol(text, false);
+        return getSymbolFromPsiElement(jsProperty) != null;
     }
 
     public static boolean isSymbol(@NotNull String text, boolean withQuotes) {
@@ -62,8 +47,8 @@ public class SymbolUtils {
             }
         });
 
-        if(text == null) return null;
-        return getSymbolFromText(text, isQuoted(text));
+        if(text == null || !isQuoted(text)) return null;
+        return getSymbolFromText(text, true);
     }
 
     public static @Nullable String getSymbolFromPsiElement(final @Nullable PsiElement psiElement) {
