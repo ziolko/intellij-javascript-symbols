@@ -1,5 +1,7 @@
 package com.webstorm.symbols;
 
+import com.intellij.json.psi.JsonProperty;
+import com.intellij.json.psi.JsonStringLiteral;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.psi.PsiElement;
@@ -13,10 +15,15 @@ public class SymbolUsageTypeProvider implements UsageTypeProvider {
     @Nullable
     @Override
     public UsageType getUsageType(PsiElement element) {
-        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(element);
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteralExpression(element);
         final JSProperty jsProperty = SymbolUtils.getJSProperty(element);
+        final JsonStringLiteral jsonStringLiteral = SymbolUtils.getJsonStringLiteral(element);
+        final JsonProperty jsonProperty = SymbolUtils.getJsonProperty(element);
 
-        if(SymbolUtils.isSymbol(jsLiteralExpression) || SymbolUtils.isSymbol(jsProperty)) {
+        if (SymbolUtils.isSymbol(jsLiteralExpression) ||
+            SymbolUtils.isSymbol(jsProperty) ||
+            SymbolUtils.isSymbol(jsonStringLiteral) ||
+            SymbolUtils.isSymbol(jsonProperty)) {
             return JAVASCRIPT_SYMBOL;
         }
 

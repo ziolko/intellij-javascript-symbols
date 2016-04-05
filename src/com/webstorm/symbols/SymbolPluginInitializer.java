@@ -2,6 +2,7 @@ package com.webstorm.symbols;
 
 import com.intellij.codeInsight.TargetElementEvaluator;
 import com.intellij.codeInsight.TargetElementUtilBase;
+import com.intellij.json.JsonLanguage;
 import com.intellij.lang.LanguageExtension;
 import com.intellij.lang.javascript.JavaScriptSupportLoader;
 import com.intellij.lang.javascript.JavascriptLanguage;
@@ -26,6 +27,7 @@ public class SymbolPluginInitializer implements ApplicationComponent {
             final LanguageExtension<TargetElementEvaluator> targetEvaluatorList = (LanguageExtension<TargetElementEvaluator>) targetElementEvaluator.get(targetElementUtil);
             targetEvaluatorList.addExplicitExtension(JavascriptLanguage.INSTANCE, new SymbolReferenceTargetEvaluator());
             targetEvaluatorList.addExplicitExtension(JavaScriptSupportLoader.ECMA_SCRIPT_6, new SymbolReferenceTargetEvaluator());
+            targetEvaluatorList.addExplicitExtension(JsonLanguage.INSTANCE, new SymbolReferenceTargetEvaluator());
 
             targetElementEvaluator.setAccessible(wasAccessible);
         } catch (Exception exception) {

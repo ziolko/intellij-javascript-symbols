@@ -63,9 +63,14 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <completion.contributor language="JavaScript" implementationClass="com.webstorm.symbols.SymbolCompletionContributor"/>
+    <completion.contributor language="JSON" implementationClass="com.webstorm.symbols.SymbolCompletionContributor"/>
+
     <annotator language="JavaScript" implementationClass="com.webstorm.symbols.annotate.SymbolAnnotator"/>
+    <annotator language="JSON" implementationClass="com.webstorm.symbols.annotate.SymbolAnnotator"/>
+
     <findUsagesHandlerFactory id="JavaScript" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
     <findUsagesHandlerFactory id="ECMAScript 6" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
+    <findUsagesHandlerFactory id="JSON" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
 
     <renameHandler implementation="com.webstorm.symbols.rename.SymbolRenameHandler" />
     <gotoDeclarationHandler implementation="com.webstorm.symbols.declaration.SymbolGoToDeclarationHandler"/>

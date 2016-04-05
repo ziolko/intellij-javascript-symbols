@@ -1,5 +1,6 @@
 package com.webstorm.symbols.reference;
 
+import com.intellij.json.psi.JsonStringLiteral;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.javascript.JSElementTypes;
 import com.intellij.lang.javascript.JSTokenTypes;
@@ -36,6 +37,8 @@ class SymbolReference implements PsiReference {
     @Override
     public TextRange getRangeInElement() {
         final JSProperty jsProperty = SymbolUtils.getJSProperty(element);
+        final JsonStringLiteral jsonStringLiteral = SymbolUtils.getJsonStringLiteral(element);
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteralExpression(element);
 
         if(jsProperty != null) {
             PsiElement nameIdentifier = ApplicationManager.getApplication().runReadAction(new Computable<PsiElement>() {
@@ -46,6 +49,21 @@ class SymbolReference implements PsiReference {
             });
 
             if(nameIdentifier != null) return new TextRange(0, nameIdentifier.getTextLength());
+        }
+
+        if(jsonStringLiteral != null) {
+            final TextRange textRange = ApplicationManager.getApplication().runReadAction(new Computable<TextRange>() {
+                @Override
+                public TextRange compute() {
+                   return jsonStringLiteral.getTextRange();
+                }
+            });
+
+            return new TextRange(1, textRange.getLength() -1);
+        }
+
+        if(jsLiteralExpression != null && jsLiteralExpression.isQuotedLiteral()) {
+            return new TextRange(1, element.getTextLength() - 1);
         }
 
         return new TextRange(0, element.getTextLength());
@@ -65,8 +83,9 @@ class SymbolReference implements PsiReference {
 
     @Override
     public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(element);
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteralExpression(element);
         final JSProperty jsProperty = SymbolUtils.getJSProperty(element);
+        final JsonStringLiteral jsonStringLiteral = SymbolUtils.getJsonStringLiteral(element);
 
         if(jsLiteralExpression != null) {
             final ElementManipulator<JSLiteralExpression> manipulator = ElementManipulators.getManipulator(jsLiteralExpression);
@@ -90,6 +109,11 @@ class SymbolReference implements PsiReference {
             }
 
             parent.replaceChild(renamedNode, nameElement);
+        }
+
+        if(jsonStringLiteral != null) {
+            final ElementManipulator<JsonStringLiteral> manipulator = ElementManipulators.getManipulator(jsonStringLiteral);
+            return manipulator.handleContentChange(jsonStringLiteral, newElementName);
         }
 
         return element;

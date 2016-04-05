@@ -1,13 +1,12 @@
 package com.webstorm.symbols.rename;
 
-import com.intellij.lang.findUsages.DescriptiveNameUtil;
+import com.intellij.json.psi.JsonStringLiteral;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.refactoring.rename.RenameDialog;
-import com.intellij.usageView.UsageViewUtil;
 import com.webstorm.symbols.SymbolUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,12 +18,16 @@ public class SymbolRenameDialog extends RenameDialog {
 
     @Override
     public String[] getSuggestedNames() {
-        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(getPsiElement());
-        if(!SymbolUtils.isSymbol(jsLiteralExpression)) {
-            return super.getSuggestedNames();
-        }
+        final PsiElement psiElement = SymbolUtils.getSymbolElement(getPsiElement());
 
-        return new String[] { SymbolUtils.getSymbolFromPsiElement(jsLiteralExpression) };
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteralExpression(psiElement);
+        final JsonStringLiteral jsonStringLiteral = SymbolUtils.getJsonStringLiteral(psiElement);
+
+        String text = SymbolUtils.getSymbolFromPsiElement(jsLiteralExpression);
+        if(text == null) text = SymbolUtils.getSymbolFromPsiElement(jsonStringLiteral);
+        if(text == null) return super.getSuggestedNames();
+
+        return new String[] { text };
     }
 
     @Override
@@ -41,7 +44,7 @@ public class SymbolRenameDialog extends RenameDialog {
 
     @Override
     protected String getFullName() {
-        String symbolName = DescriptiveNameUtil.getDescriptiveName(getPsiElement());
+        String symbolName = getPsiElement().getText();
         return ("JavaScript symbol " + symbolName).trim();
     }
 }

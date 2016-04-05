@@ -1,5 +1,6 @@
 package com.webstorm.symbols.annotate;
 
+import com.intellij.json.psi.JsonStringLiteral;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
@@ -32,8 +33,9 @@ public class SymbolAnnotator implements Annotator {
         final String symbol = SymbolUtils.getSymbolFromPsiElement(symbolPsiElement);
         final Project project = symbolPsiElement.getProject();
 
-        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(symbolPsiElement);
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteralExpression(symbolPsiElement);
         final JSProperty jsProperty = SymbolUtils.getJSProperty(symbolPsiElement);
+        final JsonStringLiteral jsonStringLiteral = SymbolUtils.getJsonStringLiteral(symbolPsiElement);
 
         final TextRange range;
 
@@ -52,6 +54,14 @@ public class SymbolAnnotator implements Annotator {
                     if(end <= start) return null;
 
                     return new TextRange(start, end);
+                }
+            });
+        } else if(jsonStringLiteral != null) {
+            range = ApplicationManager.getApplication().runReadAction(new Computable<TextRange>() {
+                @Override
+                public TextRange compute() {
+                    final TextRange range = jsonStringLiteral.getTextRange();
+                    return new TextRange(range.getStartOffset() + 1, range.getEndOffset() - 1);
                 }
             });
         } else {

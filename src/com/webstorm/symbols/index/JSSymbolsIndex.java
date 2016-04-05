@@ -1,6 +1,7 @@
 package com.webstorm.symbols.index;
 
 import com.google.common.collect.Maps;
+import com.intellij.json.JsonFileType;
 import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.StdFileTypes;
@@ -80,6 +81,7 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
                 fileTypeSink.consume(StdFileTypes.HTML);
                 fileTypeSink.consume(StdFileTypes.JS);
                 fileTypeSink.consume(StdFileTypes.XHTML);
+                fileTypeSink.consume(JsonFileType.INSTANCE);
             }
 
             @Override

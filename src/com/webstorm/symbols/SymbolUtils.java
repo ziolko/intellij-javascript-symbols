@@ -1,5 +1,7 @@
 package com.webstorm.symbols;
 
+import com.intellij.json.psi.JsonProperty;
+import com.intellij.json.psi.JsonStringLiteral;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.application.ApplicationManager;
@@ -20,6 +22,14 @@ public class SymbolUtils {
 
     public static boolean isSymbol(final @Nullable JSProperty jsProperty) {
         return getSymbolFromPsiElement(jsProperty) != null;
+    }
+
+    public static boolean isSymbol(final @Nullable JsonStringLiteral jsonStringLiteral) {
+        return getSymbolFromPsiElement(jsonStringLiteral) != null;
+    }
+
+    public static boolean isSymbol(final @Nullable JsonProperty jsonProperty) {
+        return getSymbolFromPsiElement(jsonProperty) != null;
     }
 
     public static boolean isSymbol(@NotNull String text, boolean withQuotes) {
@@ -51,15 +61,48 @@ public class SymbolUtils {
         return getSymbolFromText(text, true);
     }
 
+    public static @Nullable String getSymbolFromPsiElement(final @Nullable JsonStringLiteral psiElement) {
+        if(psiElement == null) return null;
+        final String text = ApplicationManager.getApplication().runReadAction(new Computable<String>() {
+            @Override
+            public String compute() {
+                return psiElement.getText();
+            }
+        });
+
+        return getSymbolFromText(text, true);
+    }
+
+    public static @Nullable String getSymbolFromPsiElement(final @Nullable JsonProperty psiElement) {
+        if(psiElement == null) return null;
+        final String text = ApplicationManager.getApplication().runReadAction(new Computable<String>() {
+            @Override
+            public String compute() {
+                return psiElement.getName();
+            }
+        });
+
+        return getSymbolFromText(text, false);
+    }
+
     public static @Nullable String getSymbolFromPsiElement(final @Nullable PsiElement psiElement) {
-        final JSLiteralExpression jsLiteralExpression = getJSLiteraExpression(psiElement);
+        final JSLiteralExpression jsLiteralExpression = getJSLiteralExpression(psiElement);
         final JSProperty jsProperty = getJSProperty(psiElement);
+        final JsonStringLiteral jsonStringLiteral = getJsonStringLiteral(psiElement);
+        final JsonProperty jsonProperty = getJsonProperty(psiElement);
 
         if(jsLiteralExpression != null) {
             return SymbolUtils.getSymbolFromPsiElement(jsLiteralExpression);
         }
         if(jsProperty != null) {
             return SymbolUtils.getSymbolFromPsiElement(jsProperty);
+        }
+        if(jsonStringLiteral != null) {
+            return SymbolUtils.getSymbolFromPsiElement(jsonStringLiteral);
+        }
+
+        if(jsonProperty != null) {
+            return SymbolUtils.getSymbolFromPsiElement(jsonProperty);
         }
 
         return null;
@@ -93,14 +136,18 @@ public class SymbolUtils {
         file.acceptChildren(new PsiRecursiveElementVisitor() {
             @Override
             public void visitElement(PsiElement element) {
-                final JSLiteralExpression jsLiteralExpression = getJSLiteraExpression(element);
+                final JSLiteralExpression jsLiteralExpression = getJSLiteralExpression(element);
                 final JSProperty jsProperty = getJSProperty(element);
+                final JsonStringLiteral jsonStringLiteral = getJsonStringLiteral(element);
+                final JsonProperty jsonProperty = getJsonProperty(element);
 
                 if(isSymbol(jsLiteralExpression)) {
                     processor.process(jsLiteralExpression);
-                } else if(isSymbol(jsProperty)){
+                } else if(isSymbol(jsProperty)) {
                     processor.process(jsProperty);
                     super.visitElement(element);
+                } else if(isSymbol(jsonStringLiteral)) {
+                    processor.process(jsonStringLiteral);
                 } else {
                     super.visitElement(element);
                 }
@@ -109,7 +156,7 @@ public class SymbolUtils {
     }
 
     @Nullable
-    public static JSLiteralExpression getJSLiteraExpression(@Nullable final PsiElement psiElement) {
+    public static JSLiteralExpression getJSLiteralExpression(@Nullable final PsiElement psiElement) {
         if(psiElement == null) return null;
         if(psiElement instanceof JSLiteralExpression) return (JSLiteralExpression) psiElement;
 
@@ -128,28 +175,50 @@ public class SymbolUtils {
         return (psiElement instanceof JSProperty) ? (JSProperty) psiElement : null;
     }
 
+    @Nullable
+    public static JsonStringLiteral getJsonStringLiteral(@Nullable final PsiElement psiElement) {
+        return (psiElement instanceof JsonStringLiteral) ? (JsonStringLiteral) psiElement : null;
+    }
+
+    @Nullable
+    public static JsonProperty getJsonProperty(@Nullable final PsiElement psiElement) {
+        return (psiElement instanceof JsonProperty) ? (JsonProperty) psiElement : null;
+    }
+
     public static boolean isQuoted(final @Nullable String text) {
         return text != null && (text.charAt(0) == '\'' || text.charAt(0) == '"');
     }
 
     @Nullable
     public static PsiElement getSymbolElement(@Nullable final PsiElement sourceElement) {
-        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteraExpression(sourceElement);
+        final JSLiteralExpression jsLiteralExpression = SymbolUtils.getJSLiteralExpression(sourceElement);
         if(SymbolUtils.isSymbol(jsLiteralExpression)) return jsLiteralExpression;
+
+        final JsonStringLiteral jsonStringLiteral = SymbolUtils.getJsonStringLiteral(sourceElement);
+        if(SymbolUtils.isSymbol(jsonStringLiteral)) return jsonStringLiteral;
 
         final JSProperty jsProperty = SymbolUtils.getJSProperty(sourceElement);
         if(SymbolUtils.isSymbol(jsProperty)) return jsProperty;
 
-        if(sourceElement instanceof LeafPsiElement) {
-            final JSProperty parentJsProperty = ApplicationManager.getApplication().runReadAction(new Computable<JSProperty>() {
-                @Override
-                public JSProperty compute() {
-                    return SymbolUtils.getJSProperty(sourceElement.getParent());
-                }
-            });
+        final JsonProperty jsonProperty = SymbolUtils.getJsonProperty(sourceElement);
+        if(SymbolUtils.isSymbol(jsonProperty)) return jsonProperty;
 
-            if(SymbolUtils.isSymbol(parentJsProperty)) return parentJsProperty;
+        if(!(sourceElement instanceof LeafPsiElement)) {
+            return null;
         }
+
+        final PsiElement parent = ApplicationManager.getApplication().runReadAction(new Computable<PsiElement>() {
+            @Override
+            public PsiElement compute() {
+                return sourceElement.getParent();
+            }
+        });
+
+        final JSProperty parentJsProperty = SymbolUtils.getJSProperty(parent);
+        final JsonStringLiteral parentJsonStringLiteral = SymbolUtils.getJsonStringLiteral(parent);
+
+        if(SymbolUtils.isSymbol(parentJsProperty)) return parentJsProperty;
+        if(SymbolUtils.isSymbol(parentJsonStringLiteral)) return parentJsonStringLiteral;
 
         return null;
     }

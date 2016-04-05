@@ -2,6 +2,7 @@ package com.webstorm.symbols.findUsages;
 
 import com.intellij.find.findUsages.FindUsagesHandler;
 import com.intellij.find.findUsages.FindUsagesHandlerFactory;
+import com.intellij.json.psi.JsonProperty;
 import com.intellij.psi.PsiElement;
 import com.webstorm.symbols.psi.SymbolLiteralExpressionImpl;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public class MyFindUsagesHandlerFactory extends FindUsagesHandlerFactory {
     @Override
     public boolean canFindUsages(@NotNull PsiElement psiElement) {
-        return psiElement instanceof SymbolLiteralExpressionImpl;
+        return psiElement instanceof SymbolLiteralExpressionImpl || psiElement instanceof JsonProperty;
     }
 
     @Nullable
