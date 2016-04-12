@@ -119,6 +119,12 @@ public class SymbolLiteralExpressionImpl implements JSLiteralExpression, PsiName
         return impl.getValueAsPropertyName();
     }
 
+    @Nullable
+    @Override
+    public String getSignificantValue() {
+        return impl.getSignificantValue();
+    }
+
     @Override
     @Nullable
     public Object getValue() {

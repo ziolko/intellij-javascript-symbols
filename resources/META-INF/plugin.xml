@@ -1,10 +1,10 @@
 <idea-plugin version="2">
-  <id>com.webstorm.symbols</id>
-  <name>Symbols for JavaScript</name>
-  <version>2.1</version>
-  <vendor email="mateusz.mzielinski@gmail.com" url="https://github.com/ziolko">Mateusz Zieliński</vendor>
+    <id>com.webstorm.symbols</id>
+    <name>Symbols for JavaScript</name>
+    <version>2.2</version>
+    <vendor email="mateusz.mzielinski@gmail.com" url="https://github.com/ziolko">Mateusz Zieliński</vendor>
 
-  <description><![CDATA[
+    <description><![CDATA[
         In JavaScript we quite often use strings as some kind of identifiers. Event and module names are good examples here.
         <br><br>
         A good IDE should support this in my opinion. With this plugin you can define a format
@@ -17,67 +17,76 @@
         Find more details on the <a href="https://github.com/ziolko/intellij-javascript-symbols">project home page</a>.
     ]]></description>
 
-  <change-notes><![CDATA[
-  <html>
-    <b>2.1</b> (03/20/2016)
-    <ul>
-      <li>Scanning string property names in objects
-      <li>Scanning JavaScript in HTML files
-    </ul>
-    <b>2.0.2</b> (03/01/2016)
-    <ul>
-      <li>Fix for "Exception: Read access is allowed from event dispatch thread".
-    </ul>
-    <b>2.0.1</b> (02/15/2016)
-    <ul>
-      <li>Fix "java.lang.NoSuchMethodError" for Java 7.
-      <li>Update plugin description.
-    </ul>
-    <b>2.0</b> (02/07/2016)
-    <ul>
-      <li>Configuration of recognized regular expressions.
-      <li>"Go to declaration" (CTRL + click) shows all symbol usages.
-      <li>Support for WebStorm 10 & IDEA 14.
-    </ul>
-    <b>1.0</b> (01/25/2016)
-    <ul>
-      <li>Initial release.
-    </ul>
-  </html>
-  ]]></change-notes>
+    <change-notes><![CDATA[
+      <html>
+        <b>2.2</b> (04/13/2016)
+        <ul>
+          <li>Scanning JSON files
+        </ul>
+        <b>2.1</b> (03/20/2016)
+        <ul>
+          <li>Scanning string property names in objects
+          <li>Scanning JavaScript in HTML files
+        </ul>
+        <b>2.0.2</b> (03/01/2016)
+        <ul>
+          <li>Fix for "Exception: Read access is allowed from event dispatch thread".
+        </ul>
+        <b>2.0.1</b> (02/15/2016)
+        <ul>
+          <li>Fix "java.lang.NoSuchMethodError" for Java 7.
+          <li>Update plugin description.
+        </ul>
+        <b>2.0</b> (02/07/2016)
+        <ul>
+          <li>Configuration of recognized regular expressions.
+          <li>"Go to declaration" (CTRL + click) shows all symbol usages.
+          <li>Support for WebStorm 10 & IDEA 14.
+        </ul>
+        <b>1.0</b> (01/25/2016)
+        <ul>
+          <li>Initial release.
+        </ul>
+      </html>
+      ]]>
+    </change-notes>
 
-  <idea-version since-build="141.0"/>
+    <idea-version since-build="141.0"/>
 
-  <depends>com.intellij.modules.lang</depends>
-  <depends>JavaScript</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>JavaScript</depends>
 
-  <application-components>
-  <!-- Add your application components here -->
-    <component>
-      <implementation-class>com.webstorm.symbols.SymbolPluginInitializer</implementation-class>
-    </component>
-    <component>
-      <implementation-class>com.webstorm.symbols.settings.SettingsComponent</implementation-class>
-    </component>
-  </application-components>
+    <application-components>
+        <!-- Add your application components here -->
+        <component>
+            <implementation-class>com.webstorm.symbols.SymbolPluginInitializer</implementation-class>
+        </component>
+        <component>
+            <implementation-class>com.webstorm.symbols.settings.SettingsComponent</implementation-class>
+        </component>
+    </application-components>
 
-  <extensions defaultExtensionNs="com.intellij">
-    <completion.contributor language="JavaScript" implementationClass="com.webstorm.symbols.SymbolCompletionContributor"/>
-    <completion.contributor language="JSON" implementationClass="com.webstorm.symbols.SymbolCompletionContributor"/>
+    <extensions defaultExtensionNs="com.intellij">
+        <completion.contributor language="JavaScript"
+                                implementationClass="com.webstorm.symbols.SymbolCompletionContributor"/>
+        <completion.contributor language="JSON" implementationClass="com.webstorm.symbols.SymbolCompletionContributor"/>
 
-    <annotator language="JavaScript" implementationClass="com.webstorm.symbols.annotate.SymbolAnnotator"/>
-    <annotator language="JSON" implementationClass="com.webstorm.symbols.annotate.SymbolAnnotator"/>
+        <annotator language="JavaScript" implementationClass="com.webstorm.symbols.annotate.SymbolAnnotator"/>
+        <annotator language="JSON" implementationClass="com.webstorm.symbols.annotate.SymbolAnnotator"/>
 
-    <findUsagesHandlerFactory id="JavaScript" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
-    <findUsagesHandlerFactory id="ECMAScript 6" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
-    <findUsagesHandlerFactory id="JSON" implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
+        <findUsagesHandlerFactory id="JavaScript"
+                                  implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
+        <findUsagesHandlerFactory id="ECMAScript 6"
+                                  implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
+        <findUsagesHandlerFactory id="JSON"
+                                  implementation="com.webstorm.symbols.findUsages.MyFindUsagesHandlerFactory"/>
 
-    <renameHandler implementation="com.webstorm.symbols.rename.SymbolRenameHandler" />
-    <gotoDeclarationHandler implementation="com.webstorm.symbols.declaration.SymbolGoToDeclarationHandler"/>
-    <referencesSearch  implementation="com.webstorm.symbols.reference.SymbolReferencesSearch"/>
-    <usageTypeProvider implementation="com.webstorm.symbols.SymbolUsageTypeProvider"/>
-    <elementDescriptionProvider implementation="com.webstorm.symbols.SymbolElementDescriptionProvider" />
-    <fileBasedIndex implementation="com.webstorm.symbols.index.JSSymbolsIndex"/>
-    <applicationConfigurable instance="com.webstorm.symbols.settings.SettingsForm"/>
-  </extensions>
+        <renameHandler implementation="com.webstorm.symbols.rename.SymbolRenameHandler"/>
+        <gotoDeclarationHandler implementation="com.webstorm.symbols.declaration.SymbolGoToDeclarationHandler"/>
+        <referencesSearch implementation="com.webstorm.symbols.reference.SymbolReferencesSearch"/>
+        <usageTypeProvider implementation="com.webstorm.symbols.SymbolUsageTypeProvider"/>
+        <elementDescriptionProvider implementation="com.webstorm.symbols.SymbolElementDescriptionProvider"/>
+        <fileBasedIndex implementation="com.webstorm.symbols.index.JSSymbolsIndex"/>
+        <applicationConfigurable instance="com.webstorm.symbols.settings.SettingsForm"/>
+    </extensions>
 </idea-plugin>
