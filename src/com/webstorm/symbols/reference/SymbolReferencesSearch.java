@@ -20,7 +20,6 @@ import com.webstorm.symbols.index.JSSymbolsIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Objects;
 
 public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, ReferencesSearch.SearchParameters> {
     @Override
@@ -70,7 +69,7 @@ public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, Refe
                     public boolean process(PsiElement element) {
                         final String symbolText = SymbolUtils.getSymbolFromPsiElement(element);
 
-                        if (Objects.equals(symbolText, searchedSymbolText)) {
+                        if(symbolText != null && symbolText.equals(searchedSymbolText)) {
                             processor.process(new SymbolReference(searchedElement, element));
                         }
 

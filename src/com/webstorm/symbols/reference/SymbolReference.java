@@ -19,8 +19,6 @@ import com.webstorm.symbols.SymbolUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-
 class SymbolReference implements PsiReference {
     private PsiElement baseElement, element;
 
@@ -126,7 +124,7 @@ class SymbolReference implements PsiReference {
 
     @Override
     public boolean isReferenceTo(PsiElement element) {
-        return Objects.equals(element.getText(), baseElement.getText());
+        return element.getText() != null && element.getText().equals(baseElement.getText());
     }
 
     @NotNull
