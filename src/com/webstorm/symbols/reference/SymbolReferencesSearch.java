@@ -32,11 +32,11 @@ public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, Refe
             return;
         }
 
-        if(searchParameters.getEffectiveSearchScope() instanceof LocalSearchScope) {
-            processPsiFile(psiElement.getContainingFile(), psiElement, processor);
+        if(searchParameters.getScope() instanceof LocalSearchScope) {
+            processPsiFile(SymbolUtils.getRootPsiFile(psiElement), psiElement, processor);
         }
-        else if(searchParameters.getEffectiveSearchScope() instanceof GlobalSearchScope) {
-            final GlobalSearchScope globalSearchScope = (GlobalSearchScope) searchParameters.getEffectiveSearchScope();
+        else if(searchParameters.getScope() instanceof GlobalSearchScope) {
+            final GlobalSearchScope globalSearchScope = (GlobalSearchScope) searchParameters.getScope();
             final Collection<VirtualFile> filesWithSymbols = ApplicationManager.getApplication().runReadAction(new Computable<Collection<VirtualFile>>() {
                         @Override
                         public Collection<VirtualFile> compute() {

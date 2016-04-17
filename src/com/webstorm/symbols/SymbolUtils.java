@@ -1,19 +1,28 @@
 package com.webstorm.symbols;
 
+import com.google.common.collect.Lists;
+import com.intellij.injected.editor.DocumentWindow;
+import com.intellij.injected.editor.VirtualFileWindow;
 import com.intellij.json.psi.JsonProperty;
 import com.intellij.json.psi.JsonStringLiteral;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.Computable;
+import com.intellij.psi.PsiDocumentManager;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import com.intellij.util.Processor;
+import com.webstorm.symbols.reference.SymbolReference;
 import com.webstorm.symbols.settings.SettingsComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.Objects;
 
 public class SymbolUtils {
     public static boolean isSymbol(final @Nullable JSLiteralExpression psiElement) {
@@ -132,14 +141,13 @@ public class SymbolUtils {
         return null;
     }
 
-    public static void processSymbolsInPsiFile(@NotNull PsiFile file, final @NotNull Processor<PsiElement> processor) {
+    public static void processSymbolsInPsiFile(@NotNull final PsiFile file, final @NotNull Processor<PsiElement> processor) {
         file.acceptChildren(new PsiRecursiveElementVisitor() {
             @Override
             public void visitElement(PsiElement element) {
                 final JSLiteralExpression jsLiteralExpression = getJSLiteralExpression(element);
                 final JSProperty jsProperty = getJSProperty(element);
                 final JsonStringLiteral jsonStringLiteral = getJsonStringLiteral(element);
-                final JsonProperty jsonProperty = getJsonProperty(element);
 
                 if(isSymbol(jsLiteralExpression)) {
                     processor.process(jsLiteralExpression);
@@ -153,6 +161,33 @@ public class SymbolUtils {
                 }
             }
         });
+    }
+
+    public static List<SymbolReference> getSymbolReferencesInPsiFile(final PsiFile psiFile, final PsiElement searchedElement) {
+        final List<SymbolReference> result = Lists.newArrayList();
+        final String searchedSymbolText = SymbolUtils.getSymbolFromPsiElement(searchedElement);
+
+        final Processor<PsiElement> symbolProcessor = new Processor<PsiElement>() {
+            @Override
+            public boolean process(PsiElement element) {
+                final String symbolText = SymbolUtils.getSymbolFromPsiElement(element);
+
+                if (Objects.equals(symbolText, searchedSymbolText)) {
+                    result.add(new SymbolReference(searchedElement, element));
+                }
+
+                return true;
+            }
+        };
+
+        ApplicationManager.getApplication().runReadAction(new Runnable() {
+            @Override
+            public void run() {
+                SymbolUtils.processSymbolsInPsiFile(psiFile, symbolProcessor);
+            }
+        });
+
+        return result;
     }
 
     @Nullable
@@ -221,5 +256,17 @@ public class SymbolUtils {
         if(SymbolUtils.isSymbol(parentJsonStringLiteral)) return parentJsonStringLiteral;
 
         return null;
+    }
+
+    public static PsiFile getRootPsiFile(PsiElement psiElement) {
+        if(psiElement.getContainingFile().getVirtualFile() instanceof VirtualFileWindow) {
+            final DocumentWindow documentWindow = ((VirtualFileWindow)psiElement.getContainingFile().getVirtualFile()).getDocumentWindow();
+            final Document document = documentWindow.getDelegate();
+
+            final PsiDocumentManager psiDocumentManager = PsiDocumentManager.getInstance(psiElement.getProject());
+            return psiDocumentManager.getPsiFile(document);
+        }
+
+        return psiElement.getContainingFile();
     }
 }

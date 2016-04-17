@@ -3,10 +3,12 @@ package com.webstorm.symbols.reference;
 import com.intellij.json.psi.JsonStringLiteral;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.javascript.JSElementTypes;
+import com.intellij.lang.javascript.JSLanguageDialect;
 import com.intellij.lang.javascript.JSTokenTypes;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
 import com.intellij.lang.javascript.psi.JSProperty;
 import com.intellij.lang.javascript.psi.impl.JSChangeUtil;
+import com.intellij.lang.javascript.psi.util.JSUtils;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.TextRange;
@@ -21,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-class SymbolReference implements PsiReference {
+public class SymbolReference implements PsiReference {
     private PsiElement baseElement, element;
 
     public SymbolReference(PsiElement baseElement, PsiElement element) {
@@ -88,8 +90,12 @@ class SymbolReference implements PsiReference {
         final JsonStringLiteral jsonStringLiteral = SymbolUtils.getJsonStringLiteral(element);
 
         if(jsLiteralExpression != null) {
-            final ElementManipulator<JSLiteralExpression> manipulator = ElementManipulators.getManipulator(jsLiteralExpression);
-            return manipulator.handleContentChange(jsLiteralExpression, newElementName);
+            JSLanguageDialect dialect = JSUtils.getDialect(element.getContainingFile());
+
+            final ASTNode replacedNode = element.getNode();
+            final ASTNode newNode = JSChangeUtil.createStatementFromText(element.getProject(), "'" + newElementName + "'", dialect);
+
+            replacedNode.getTreeParent().replaceChild(replacedNode, newNode);
         }
 
         if(jsProperty != null) {

@@ -16,6 +16,7 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch;
 import com.intellij.util.Processor;
 import com.webstorm.symbols.SymbolUtils;
+import com.webstorm.symbols.angular.AngularSymbolReferencesSearch;
 import com.webstorm.symbols.reference.SymbolReferencesSearch;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,12 +31,21 @@ public class SymbolGoToDeclarationHandler implements GotoDeclarationHandler {
         if(symbolElement == null) return null;
 
         final SymbolReferencesSearch symbolReferencesSearch = new SymbolReferencesSearch();
+        final AngularSymbolReferencesSearch angularSymbolReferencesSearch = new AngularSymbolReferencesSearch();
         final SearchScope searchScope = GlobalSearchScope.projectScope(symbolElement.getProject());
         final ReferencesSearch.SearchParameters searchParameters = new ReferencesSearch.SearchParameters(symbolElement, searchScope, false);
 
         final ArrayList<PsiElement> psiElements = Lists.newArrayList();
 
         symbolReferencesSearch.processQuery(searchParameters, new Processor<PsiReference>() {
+            @Override
+            public boolean process(PsiReference psiReference) {
+                psiElements.add(psiReference.getElement());
+                return true;
+            }
+        });
+
+        angularSymbolReferencesSearch.processQuery(searchParameters, new Processor<PsiReference>() {
             @Override
             public boolean process(PsiReference psiReference) {
                 psiElements.add(psiReference.getElement());
