@@ -19,6 +19,10 @@
 
     <change-notes><![CDATA[
       <html>
+        <b>2.3-RC1</b> (04/23/2016)
+        <ul>
+          <li>Scanning AngularJS expressions
+        </ul>
         <b>2.2</b> (04/13/2016)
         <ul>
           <li>Scanning JSON files
