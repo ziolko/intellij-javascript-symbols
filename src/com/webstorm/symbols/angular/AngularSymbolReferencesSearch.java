@@ -2,6 +2,7 @@ package com.webstorm.symbols.angular;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.QueryExecutorBase;
 import com.intellij.openapi.util.Computable;
@@ -28,15 +29,10 @@ public class AngularSymbolReferencesSearch extends QueryExecutorBase<PsiReferenc
         }
 
         final PsiElement psiElement = searchParameters.getElementToSearch();
-        final String searchedSymbolText = SymbolUtils.getSymbolFromPsiElement(psiElement);
-
-        if (searchedSymbolText == null) {
-            return;
-        }
 
         if(searchParameters.getScope() instanceof GlobalSearchScope) {
             final GlobalSearchScope globalSearchScope = (GlobalSearchScope) searchParameters.getScope();
-            final Collection<PsiFile> angularFilesWithSymbols = getPsiFilesWithText(searchedSymbolText, globalSearchScope);
+            final Collection<PsiFile> angularFilesWithSymbols = getPsiFilesWithText(psiElement, globalSearchScope);
 
             for(final PsiFile psiFile : angularFilesWithSymbols) {
                 processPsiFileWithInjectedAngularDirectives(psiFile, psiElement, processor);
@@ -46,7 +42,13 @@ public class AngularSymbolReferencesSearch extends QueryExecutorBase<PsiReferenc
         }
     }
 
-    private Collection<PsiFile> getPsiFilesWithText(final String searchedSymbolText, final GlobalSearchScope globalSearchScope) {
+    private Collection<PsiFile> getPsiFilesWithText(final PsiElement searchedElement, final GlobalSearchScope globalSearchScope) {
+        final String searchedSymbolText = SymbolUtils.getSymbolFromPsiElement(searchedElement);
+
+        if (searchedSymbolText == null) {
+            return Lists.newArrayList();
+        }
+
         final Collection<VirtualFile> angularFilesWithSymbols = ApplicationManager.getApplication().runReadAction(
                 new Computable<Collection<VirtualFile>>() {
                     @Override
@@ -63,7 +65,7 @@ public class AngularSymbolReferencesSearch extends QueryExecutorBase<PsiReferenc
                         new Computable<PsiFile>() {
                             @Override
                             public PsiFile compute() {
-                                return PsiManager.getInstance(globalSearchScope.getProject()).findFile(virtualFile);
+                                return PsiManager.getInstance(searchedElement.getProject()).findFile(virtualFile);
                             }
                         }
                 );

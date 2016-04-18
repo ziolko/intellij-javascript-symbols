@@ -4,29 +4,15 @@ import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
 import com.intellij.lang.javascript.psi.JSExpression;
 import com.intellij.lang.javascript.psi.JSLiteralExpression;
-import com.intellij.lang.javascript.psi.impl.JSLiteralExpressionImpl;
-import com.intellij.lang.javascript.psi.impl.JSStubElementImpl;
 import com.intellij.lang.javascript.psi.stubs.JSElementIndexingData;
-import com.intellij.lang.javascript.psi.stubs.JSLiteralExpressionStub;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.Iconable;
 import com.intellij.openapi.util.Key;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.psi.*;
-import com.intellij.psi.impl.ElementBase;
-import com.intellij.psi.impl.PsiManagerEx;
-import com.intellij.psi.impl.source.tree.TreeElement;
 import com.intellij.psi.scope.PsiScopeProcessor;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.SearchScope;
-import com.intellij.psi.stubs.IStubElementType;
-import com.intellij.psi.stubs.StubElement;
-import com.intellij.psi.tree.TokenSet;
-import com.intellij.ui.RowIcon;
-import com.intellij.util.ArrayFactory;
 import com.intellij.util.IncorrectOperationException;
 import com.webstorm.symbols.SymbolUtils;
 import org.jetbrains.annotations.NonNls;
@@ -117,12 +103,6 @@ public class SymbolLiteralExpressionImpl implements JSLiteralExpression, PsiName
     @Nullable
     public String getValueAsPropertyName() {
         return impl.getValueAsPropertyName();
-    }
-
-    @Nullable
-    @Override
-    public String getSignificantValue() {
-        return impl.getSignificantValue();
     }
 
     @Override

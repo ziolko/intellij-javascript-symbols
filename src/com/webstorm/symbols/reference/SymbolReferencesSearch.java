@@ -49,7 +49,7 @@ public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, Refe
                     new Computable<PsiFile>() {
                                @Override
                                public PsiFile compute() {
-                                   return PsiManager.getInstance(globalSearchScope.getProject()).findFile(virtualFile);
+                                   return PsiManager.getInstance(psiElement.getProject()).findFile(virtualFile);
                                }
                            }
                     );
