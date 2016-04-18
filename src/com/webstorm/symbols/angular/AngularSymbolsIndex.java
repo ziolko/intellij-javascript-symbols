@@ -3,6 +3,7 @@ package com.webstorm.symbols.angular;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.StdFileTypes;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.Consumer;
 import com.intellij.util.indexing.*;
@@ -22,6 +23,10 @@ public class AngularSymbolsIndex extends ScalarIndexExtension<String> {
         @Override
         public Map<String, Void> map(final @NotNull FileContent inputData) {
             final Map<String, Void> result = Maps.newHashMap();
+
+            if(!AngularSymbolUtils.isAngularPluginEnabled()) {
+                return result;
+            }
 
             for(final String symbol : AngularSymbolUtils.getSymbolsInPlainText(inputData.getPsiFile().getText())) {
                 result.put(symbol, null);
@@ -62,7 +67,7 @@ public class AngularSymbolsIndex extends ScalarIndexExtension<String> {
 
             @Override
             public boolean acceptInput(@NotNull VirtualFile file) {
-                return true;
+                return file.getFileSystem() == LocalFileSystem.getInstance() ;
             }
         };
     }

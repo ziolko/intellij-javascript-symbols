@@ -23,6 +23,10 @@ import java.util.Collection;
 public class AngularSymbolReferencesSearch extends QueryExecutorBase<PsiReference, ReferencesSearch.SearchParameters> {
     @Override
     public void processQuery(final @NotNull ReferencesSearch.SearchParameters searchParameters, final @NotNull Processor<PsiReference> processor) {
+        if(!AngularSymbolUtils.isAngularPluginEnabled()) {
+            return;
+        }
+
         final PsiElement psiElement = searchParameters.getElementToSearch();
         final String searchedSymbolText = SymbolUtils.getSymbolFromPsiElement(psiElement);
 

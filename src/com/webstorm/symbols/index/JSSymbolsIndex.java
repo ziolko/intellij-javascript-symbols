@@ -5,6 +5,7 @@ import com.intellij.json.JsonFileType;
 import com.intellij.lang.javascript.JavaScriptFileType;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.StdFileTypes;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Consumer;
@@ -86,7 +87,7 @@ public class JSSymbolsIndex extends FileBasedIndexExtension<String, Integer> {
 
             @Override
             public boolean acceptInput(@NotNull VirtualFile file) {
-                return true;
+                return file.getFileSystem() == LocalFileSystem.getInstance() ;
             }
         };
     }

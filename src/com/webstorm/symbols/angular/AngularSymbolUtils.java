@@ -22,6 +22,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AngularSymbolUtils {
+    public static boolean isAngularPluginEnabled() {
+        try {
+            Class.forName("org.angularjs.editor.AngularJSInjector");
+            return true;
+        } catch (Throwable ex) {
+            // Class or one of its dependencies is not present...
+            return false;
+        }
+    }
+
     public static Set<String> getSymbolsInPlainText(@NotNull final String text) {
         final Set<String> result = Sets.newHashSet();
 
@@ -63,6 +73,10 @@ public class AngularSymbolUtils {
     }
 
     public static int countReferencesInAngularDirectives(final PsiElement psiElement) {
+        if(!isAngularPluginEnabled()) {
+            return 0;
+        }
+
         final GlobalSearchScope searchScope = GlobalSearchScope.projectScope(psiElement.getProject());
 
         final AngularSymbolReferencesSearch angularSymbolReferencesSearch = new AngularSymbolReferencesSearch();
@@ -82,6 +96,10 @@ public class AngularSymbolUtils {
 
     private static List<PsiElement> getAngularDirectivesInFile(@NotNull final PsiFile psiFile) {
         final List<PsiElement> result = Lists.newArrayList();
+
+        if(!AngularSymbolUtils.isAngularPluginEnabled()) {
+            return result;
+        }
 
         final MultiHostRegistrar multiHostRegistrar = new MultiHostRegistrar() {
             @NotNull
