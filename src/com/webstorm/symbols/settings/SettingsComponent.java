@@ -3,6 +3,7 @@ package com.webstorm.symbols.settings;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.webstorm.symbols.angular.AngularSymbolsIndex;
 import com.webstorm.symbols.index.JSSymbolsIndex;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,6 +21,8 @@ public class SettingsComponent implements com.intellij.openapi.components.Applic
 
     public void setRegExp(final @NotNull String[] regExp) {
         FileBasedIndex.getInstance().requestRebuild(JSSymbolsIndex.INDEX_ID);
+        FileBasedIndex.getInstance().requestRebuild(AngularSymbolsIndex.INDEX_ID);
+
         PropertiesComponent.getInstance().setValues(REG_EXP_KEY, regExp);
     }
 
