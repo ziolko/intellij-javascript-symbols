@@ -16,7 +16,7 @@ public class SettingsComponent implements com.intellij.openapi.components.Applic
 
     public String[] getRegExp() {
         final String[] result = PropertiesComponent.getInstance().getValues(REG_EXP_KEY);
-        return (result != null) ? result : new String[] { "^:[a-zA-Z0-9]+[a-zA-Z0-9\\-]*$" };
+        return (result != null) ? result : new String[] { "^:[a-zA-Z0-9]+[a-zA-Z0-9\\-_]*$" };
     }
 
     public void setRegExp(final @NotNull String[] regExp) {
