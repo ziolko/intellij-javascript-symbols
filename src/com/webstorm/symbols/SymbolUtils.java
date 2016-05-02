@@ -258,7 +258,10 @@ public class SymbolUtils {
         return null;
     }
 
+    @Nullable
     public static PsiFile getRootPsiFile(PsiElement psiElement) {
+        if(psiElement == null || psiElement.getContainingFile() == null) return null;
+
         if(psiElement.getContainingFile().getVirtualFile() instanceof VirtualFileWindow) {
             final DocumentWindow documentWindow = ((VirtualFileWindow)psiElement.getContainingFile().getVirtualFile()).getDocumentWindow();
             final Document document = documentWindow.getDelegate();

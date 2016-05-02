@@ -60,6 +60,10 @@ public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, Refe
     }
 
     private void processPsiFile(final PsiFile psiFile, final PsiElement searchedElement, final Processor<PsiReference> processor) {
+        if(psiFile == null) {
+            return;
+        }
+
         ApplicationManager.getApplication().runReadAction(new Runnable() {
             @Override
             public void run() {

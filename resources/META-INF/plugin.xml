@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <id>com.webstorm.symbols</id>
     <name>Symbols for JavaScript</name>
-    <version>2.3-RC1</version>
+    <version>2.3</version>
     <vendor email="mateusz.mzielinski@gmail.com" url="https://github.com/ziolko">Mateusz Zieliński</vendor>
 
     <description><![CDATA[
@@ -19,7 +19,7 @@
 
     <change-notes><![CDATA[
       <html>
-        <b>2.3-RC1</b> (04/23/2016)
+        <b>2.3</b> (05/02/2016)
         <ul>
           <li>Scanning AngularJS expressions
         </ul>

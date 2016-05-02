@@ -74,6 +74,10 @@ public class AngularSymbolReferencesSearch extends QueryExecutorBase<PsiReferenc
     }
 
     private void processPsiFileWithInjectedAngularDirectives(final PsiFile psiFile, final PsiElement searchedElement, final Processor<PsiReference> processor) {
+        if(psiFile == null) {
+            return;
+        }
+
         for (final PsiFile injectedFile : AngularSymbolUtils.getInjectedAngularPsiFiles(psiFile)) {
             for (SymbolReference reference : SymbolUtils.getSymbolReferencesInPsiFile(injectedFile, searchedElement)) {
                 processor.process(reference);
