@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import com.intellij.lang.Language;
 import com.intellij.lang.injection.InjectedLanguageManager;
 import com.intellij.lang.injection.MultiHostRegistrar;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -117,11 +118,16 @@ public class AngularSymbolUtils {
             public void doneInjecting() { }
         };
 
-        psiFile.acceptChildren(new PsiRecursiveElementVisitor() {
+        ApplicationManager.getApplication().runReadAction(new Runnable() {
             @Override
-            public void visitElement(PsiElement element) {
-                new AngularJSInjector().getLanguagesToInject(multiHostRegistrar, element);
-                super.visitElement(element);
+            public void run() {
+                psiFile.acceptChildren(new PsiRecursiveElementVisitor() {
+                    @Override
+                    public void visitElement(PsiElement element) {
+                        new AngularJSInjector().getLanguagesToInject(multiHostRegistrar, element);
+                        super.visitElement(element);
+                    }
+                });
             }
         });
 
