@@ -43,5 +43,11 @@ You can configure recognized symbol formats in Other Settings -> JavaScript Symb
 # Contribution
 This plugin is definitely not finished. If you've found it useful feel free to contribute. 
 
+# Build instructions
+
+Build against IntelliJ IDEA Ultimate Platform SDK
+- add `plugins/JavaScriptLanguage/lib/*.jar` and `plugins/AngularJS/lib/*.jar` to the SDK classpath (Platform Settings->SDKs->Classpath)
+- build the plugin JAR with right clicking on the project -> Prepare Plugin Module 'intellij-javascript-symbols' for Deployment
+
 # License
 https://opensource.org/licenses/MIT
