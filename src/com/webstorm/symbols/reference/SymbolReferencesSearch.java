@@ -23,7 +23,7 @@ import java.util.Collection;
 
 public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, ReferencesSearch.SearchParameters> {
     @Override
-    public void processQuery(final @NotNull ReferencesSearch.SearchParameters searchParameters, final @NotNull Processor<PsiReference> processor) {
+    public void processQuery(final @NotNull ReferencesSearch.SearchParameters searchParameters, final @NotNull Processor<? super PsiReference> processor) {
         final PsiElement psiElement = searchParameters.getElementToSearch();
         final String searchedSymbolText = SymbolUtils.getSymbolFromPsiElement(psiElement);
 
@@ -59,7 +59,7 @@ public class SymbolReferencesSearch extends QueryExecutorBase<PsiReference, Refe
         }
     }
 
-    private void processPsiFile(final PsiFile psiFile, final PsiElement searchedElement, final Processor<PsiReference> processor) {
+    private void processPsiFile(final PsiFile psiFile, final PsiElement searchedElement, final Processor<? super PsiReference> processor) {
         if(psiFile == null) {
             return;
         }

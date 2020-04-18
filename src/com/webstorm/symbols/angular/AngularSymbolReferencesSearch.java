@@ -23,7 +23,7 @@ import java.util.Collection;
 
 public class AngularSymbolReferencesSearch extends QueryExecutorBase<PsiReference, ReferencesSearch.SearchParameters> {
     @Override
-    public void processQuery(final @NotNull ReferencesSearch.SearchParameters searchParameters, final @NotNull Processor<PsiReference> processor) {
+    public void processQuery(final @NotNull ReferencesSearch.SearchParameters searchParameters, final @NotNull Processor<? super PsiReference> processor) {
         if(!AngularSymbolUtils.isAngularPluginEnabled()) {
             return;
         }
@@ -73,7 +73,7 @@ public class AngularSymbolReferencesSearch extends QueryExecutorBase<PsiReferenc
         });
     }
 
-    private void processPsiFileWithInjectedAngularDirectives(final PsiFile psiFile, final PsiElement searchedElement, final Processor<PsiReference> processor) {
+    private void processPsiFileWithInjectedAngularDirectives(final PsiFile psiFile, final PsiElement searchedElement, final Processor<? super PsiReference> processor) {
         if(psiFile == null) {
             return;
         }

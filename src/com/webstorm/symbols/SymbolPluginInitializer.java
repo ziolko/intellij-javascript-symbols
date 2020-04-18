@@ -1,6 +1,7 @@
 package com.webstorm.symbols;
 
 import com.intellij.codeInsight.TargetElementEvaluator;
+import com.intellij.codeInsight.TargetElementUtil;
 import com.intellij.codeInsight.TargetElementUtilBase;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.json.JsonLanguage;
@@ -19,7 +20,7 @@ import java.lang.reflect.Field;
 public class SymbolPluginInitializer implements ApplicationComponent {
     @Override
     public void initComponent() {
-        final TargetElementUtilBase targetElementUtil = TargetElementUtilBase.getInstance();
+        final TargetElementUtil targetElementUtil = TargetElementUtil.getInstance();
 
         try {
             final Field targetElementEvaluator = targetElementUtil.getClass().getDeclaredField("targetElementEvaluator");
